@@ -25,7 +25,7 @@ const getVisibleQuestionIndices = (currentIndex: number, totalQuestions: number)
   
   // 현재 인덱스를 중심으로 앞뒤 2개씩 표시
   let startIndex = Math.max(0, currentIndex - 2);
-  let endIndex = Math.min(totalQuestions - 1, startIndex + maxVisible - 1);
+  const endIndex = Math.min(totalQuestions - 1, startIndex + maxVisible - 1);
   
   // 끝에서 시작점을 조정 (총 5개를 유지하기 위해)
   if (endIndex - startIndex + 1 < maxVisible) {
