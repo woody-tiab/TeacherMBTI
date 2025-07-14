@@ -93,26 +93,7 @@ const App: React.FC = () => {
             </Suspense>
           </main>
           
-          {/* 푸터 */}
-          <footer className="bg-white border-t border-gray-200 mt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="text-center">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-gray-600 text-sm"
-                >
-                  <p className="mb-2">
-                    🎯 교사 MBTI 수업 스타일 분석 &copy; 2024
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    당신만의 교육 스타일을 발견하고 더 나은 교사가 되어보세요
-                  </p>
-                </motion.div>
-              </div>
-            </div>
-          </footer>
+
         </div>
       </Router>
     </ErrorBoundary>

@@ -54,7 +54,7 @@ const Layout = ({
       
       <footer className="bg-white border-t border-gray-200 py-4">
         <div className="max-w-4xl mx-auto px-4 text-center text-sm text-gray-500">
-          © 2025 교사 MBTI 수업 스타일 분석. All rights reserved.
+          교사 MBTI 수업 스타일 분석 © 2025
         </div>
       </footer>
     </div>
