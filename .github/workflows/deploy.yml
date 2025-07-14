@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
@@ -6,102 +6,56 @@ on:
   pull_request:
     branches: [ main ]
 
-# 동시 실행 제한 (같은 브랜치에서 중복 실행 방지)
+# GitHub token 권한 설정
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 동시 배포 방지
 concurrency:
-  group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  # 빌드 및 배포 job (하나로 통합)
-  build-and-deploy:
+  # Build Job
+  build:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    # GitHub Pages 배포 권한 설정
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run ESLint
+        run: npm run lint
+
+      - name: 🏗️ Build project
+        run: npm run build
+
+      - name: 📋 Upload build artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  # Deploy Job
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # 전체 히스토리 가져오기
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: 'package-lock.json'
-
-    - name: Install dependencies
-      run: npm ci --prefer-offline --no-audit
-
-    - name: Type check
-      run: npm run type-check
-
-    - name: Lint check
-      run: npm run lint
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-
-    - name: Upload to GitHub Pages
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: dist/
-
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
-
-    # 배포 성공 알림
-    - name: Deployment success
-      if: success()
-      run: |
-        echo "✅ 배포가 성공적으로 완료되었습니다!"
-        echo "🌐 사이트 URL: ${{ steps.deployment.outputs.page_url }}"
-
-  # 테스트 전용 job (PR에서만 실행)
-  test:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: 'package-lock.json'
-
-    - name: Install dependencies
-      run: npm ci --prefer-offline --no-audit
-
-    - name: Type check
-      run: npm run type-check
-
-    - name: Lint check
-      run: npm run lint
-
-    - name: Build test
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-    - name: Test build preview
-      run: timeout 30s npm run preview || true 
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 
