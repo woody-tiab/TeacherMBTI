@@ -8,6 +8,7 @@ import QuestionCard from '../components/question/QuestionCard';
 import QuestionNavigation from '../components/question/QuestionNavigation';
 
 // Debounce hook for localStorage saving
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useDebounce = (value: any, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 

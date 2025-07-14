@@ -169,12 +169,13 @@ export const shareResult = async (
           };
         }
 
-      case 'copy':
+      case 'copy': {
         const copied = await copyToClipboard(`${shareData.text}\n\n${shareData.url}`);
         return {
           success: copied,
           message: copied ? SHARE_TEXT.MESSAGES.SUCCESS.LINK_COPIED : SHARE_TEXT.MESSAGES.ERROR.COPY_FAILED
         };
+      }
 
       case 'social':
         // 소셜 링크는 즉시 성공으로 처리 (외부 창 열기)
