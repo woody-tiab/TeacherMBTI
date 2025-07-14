@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import Button from '../common/Button';
 import ProgressBar from '../common/ProgressBar';
+import { MBTIAnswer } from '../../types/mbti';
 
 interface QuestionNavigationProps {
   currentQuestionIndex: number;
@@ -14,6 +15,7 @@ interface QuestionNavigationProps {
   onComplete: () => void;
   isComplete: boolean;
   isLoading: boolean;
+  getAnswerForQuestion: (questionId: number) => MBTIAnswer | undefined;
 }
 
 // Helper function for calculating visible question indices
@@ -46,7 +48,8 @@ const QuestionNavigation = ({
   onNext,
   onComplete,
   isComplete,
-  isLoading
+  isLoading,
+  getAnswerForQuestion
 }: QuestionNavigationProps) => {
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
   const visibleQuestionIndices = getVisibleQuestionIndices(currentQuestionIndex, totalQuestions);
@@ -91,7 +94,8 @@ const QuestionNavigation = ({
         <div className="flex items-center space-x-2" role="group" aria-label="질문 진행 상태">
           {visibleQuestionIndices.map((questionIndex) => {
             const isActive = questionIndex === currentQuestionIndex;
-            const isAnswered = questionIndex < currentQuestionIndex;
+            // 실제 답변 여부 확인 (questionId는 1부터 시작)
+            const isAnswered = getAnswerForQuestion(questionIndex + 1) !== undefined;
             
             let ariaLabel = `질문 ${questionIndex + 1}`;
             if (isActive) {

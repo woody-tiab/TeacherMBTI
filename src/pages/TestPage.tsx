@@ -211,6 +211,7 @@ const TestPage = () => {
             onComplete={handleComplete}
             isComplete={isComplete}
             isLoading={isLoading}
+            getAnswerForQuestion={getAnswerForQuestion}
           />
 
           {/* 저장 상태 표시 */}
