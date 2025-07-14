@@ -15,10 +15,10 @@
   ],
   "author": "VibeCoding Team",
   "license": "MIT",
-  "homepage": "https://VibeCoding.github.io/TeacherMBTI/",
+  "homepage": "https://woody-tiab.github.io/TeacherMBTI/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/VibeCoding/TeacherMBTI.git"
+    "url": "https://github.com/woody-tiab/TeacherMBTI.git"
   },
   "scripts": {
     "dev": "vite",

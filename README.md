@@ -2,7 +2,7 @@
 
 > 교사들의 수업 스타일을 16가지 MBTI 타입으로 분석하여 더 효과적인 교육 방법을 제시하는 React 웹앱
 
-[![Deploy to GitHub Pages](https://github.com/VibeCoding/TeacherMBTI/actions/workflows/deploy.yml/badge.svg)](https://github.com/VibeCoding/TeacherMBTI/actions/workflows/deploy.yml)
+[![Deploy to GitHub Pages](https://github.com/woody-tiab/TeacherMBTI/actions/workflows/deploy.yml/badge.svg)](https://github.com/woody-tiab/TeacherMBTI/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
@@ -11,7 +11,7 @@
 
 교사 MBTI 분석 웹앱은 교육자들이 자신의 수업 스타일을 이해하고 개선할 수 있도록 도와주는 도구입니다. 24개의 실제 교육 상황 기반 질문을 통해 16가지 MBTI 타입 중 하나로 분류하고, 각 타입별 맞춤형 교육 방법론을 제시합니다.
 
-**🌐 Live Demo**: [https://VibeCoding.github.io/TeacherMBTI/](https://VibeCoding.github.io/TeacherMBTI/)
+**🌐 Live Demo**: [https://woody-tiab.github.io/TeacherMBTI/](https://woody-tiab.github.io/TeacherMBTI/)
 
 ## ✨ 주요 기능
 
@@ -82,7 +82,7 @@
 
 ```bash
 # 프로젝트 클론
-git clone https://github.com/VibeCoding/TeacherMBTI.git
+git clone https://github.com/woody-tiab/TeacherMBTI.git
 cd TeacherMBTI
 
 # 의존성 설치
@@ -271,7 +271,7 @@ chore: 빌드 설정 변경
 
 ## 📞 문의
 
-프로젝트에 대한 질문이나 제안사항이 있으시면 [Issues](https://github.com/VibeCoding/TeacherMBTI/issues)를 통해 연락해 주세요.
+프로젝트에 대한 질문이나 제안사항이 있으시면 [Issues](https://github.com/woody-tiab/TeacherMBTI/issues)를 통해 연락해 주세요.
 
 ---
 
