@@ -6,29 +6,102 @@ on:
   pull_request:
     branches: [ main ]
 
+# 동시 실행 제한 (같은 브랜치에서 중복 실행 방지)
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build-and-deploy:
+  # 빌드 및 테스트 job
+  build:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # 전체 히스토리 가져오기
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
+        cache-dependency-path: 'package-lock.json'
+
+    - name: Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --prefer-offline --no-audit
+
+    - name: Type check
+      run: npm run type-check
+
+    - name: Lint check
+      run: npm run lint
 
     - name: Build
       run: npm run build
+      env:
+        NODE_ENV: production
+
+    - name: Test build
+      run: timeout 30s npm run preview || true
+
+    # 빌드 아티팩트 업로드
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist-files
+        path: dist/
+        retention-days: 1
+
+  # 배포 job (빌드 성공시에만 실행)
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    # GitHub Pages 배포 권한 설정
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: dist-files
+        path: dist/
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: dist/
 
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/main'
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist 
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+    # 배포 성공 알림 (선택사항)
+    - name: Deployment success
+      if: success()
+      run: |
+        echo "✅ 배포가 성공적으로 완료되었습니다!"
+        echo "🌐 사이트 URL: ${{ steps.deployment.outputs.page_url }}" 

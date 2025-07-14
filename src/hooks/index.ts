@@ -1,0 +1,1 @@
+export { useMBTITest } from './useMBTITest'; 

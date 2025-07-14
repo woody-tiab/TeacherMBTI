@@ -1,24 +1,47 @@
 {
   "name": "teacher-mbti",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
-  "homepage": "https://[USERNAME].github.io/TeacherMBTI/",
+  "description": "교사들의 수업 스타일을 16가지 MBTI 타입으로 분석하는 React 웹앱",
+  "keywords": [
+    "교사",
+    "MBTI",
+    "수업스타일",
+    "교육",
+    "성격분석",
+    "React",
+    "TypeScript"
+  ],
+  "author": "VibeCoding Team",
+  "license": "MIT",
+  "homepage": "https://VibeCoding.github.io/TeacherMBTI/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VibeCoding/TeacherMBTI.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:analyze": "tsc && vite build --mode analyze",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "predeploy": "npm run type-check && npm run lint && npm run build",
+    "deploy": "gh-pages -d dist",
+    "clean": "rm -rf dist node_modules/.vite",
+    "test:build": "npm run build && npm run preview"
   },
   "dependencies": {
     "framer-motion": "^11.14.4",
+    "html2canvas": "^1.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.30.0"
   },
   "devDependencies": {
+    "@types/html2canvas": "^0.5.35",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@types/react-router-dom": "^5.3.3",
@@ -32,7 +55,24 @@
     "gh-pages": "^6.3.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
+    "terser": "^5.43.1",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
