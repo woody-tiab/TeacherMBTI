@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { TestState, MBTIAnswer, MBTIResult, MBTIQuestion } from '../types/mbti';
-import { updateTestState, calculateMBTI, validateAnswers } from '../utils/mbti';
+import { updateTestState, calculateMBTI, validateAnswers, calculateProgress } from '../utils/mbti';
 import { questions } from '../data/questions';
 
 interface UseMBTITestReturn {
@@ -62,10 +62,22 @@ export const useMBTITest = (): UseMBTITestReturn => {
   const canGoPrev = testState.currentQuestionIndex > 0;
   
   // 각 질문에 대해 고유한 답변이 있는지 확인
-  const isComplete = (() => {
+  const isComplete = useMemo(() => {
     const uniqueQuestionIds = new Set(testState.answers.map(answer => answer.questionId));
     return uniqueQuestionIds.size === TOTAL_QUESTIONS;
-  })();
+  }, [testState.answers]);
+
+  // 실시간 진행률 계산
+  const currentProgress = useMemo(() => {
+    const uniqueQuestionIds = new Set(testState.answers.map(answer => answer.questionId));
+    return calculateProgress(uniqueQuestionIds.size, TOTAL_QUESTIONS);
+  }, [testState.answers]);
+
+  // testState에 실시간 진행률 적용
+  const enhancedTestState = useMemo(() => ({
+    ...testState,
+    progress: currentProgress
+  }), [testState, currentProgress]);
 
   // 테스트 시작
   const startTest = useCallback(() => {
@@ -166,7 +178,7 @@ export const useMBTITest = (): UseMBTITestReturn => {
 
   return {
     // 상태
-    testState,
+    testState: enhancedTestState,
     result,
     isLoading,
     error,

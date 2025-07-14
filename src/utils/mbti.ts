@@ -130,13 +130,13 @@ const calculateConfidence = (percentages: {EI: number, SN: number, TF: number, J
 
 /**
  * 테스트 진행률을 계산
- * @param currentQuestionIndex 현재 질문 인덱스
+ * @param answeredCount 답변한 문항 수
  * @param totalQuestions 전체 질문 수
  * @returns 진행률 (0-100)
  */
-export const calculateProgress = (currentQuestionIndex: number, totalQuestions: number = TOTAL_QUESTIONS): number => {
+export const calculateProgress = (answeredCount: number, totalQuestions: number = TOTAL_QUESTIONS): number => {
   if (totalQuestions === 0) return 0;
-  return Math.round((currentQuestionIndex / totalQuestions) * 100);
+  return Math.round((answeredCount / totalQuestions) * 100);
 };
 
 /**
