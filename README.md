@@ -275,4 +275,4 @@ chore: 빌드 설정 변경
 
 ---
 
-**Made with ❤️ by VibeCoding Team** 
+**Made with ❤️ by Kimwoody** 

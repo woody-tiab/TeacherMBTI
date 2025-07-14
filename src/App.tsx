@@ -68,6 +68,9 @@ const AnimatedRoutes: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  console.log('🚀 App 컴포넌트 렌더링 시작')
+  console.log('📍 Router basename:', '/TeacherMBTI')
+  
   return (
     <ErrorBoundary>
       <Router basename="/TeacherMBTI">
