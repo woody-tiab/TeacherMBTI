@@ -23,15 +23,18 @@ const getVisibleQuestionIndices = (currentIndex: number, totalQuestions: number)
   const maxVisible = Math.min(5, totalQuestions);
   const indices: number[] = [];
   
-  for (let i = 0; i < maxVisible; i++) {
-    const questionIndex = Math.max(
-      0, 
-      Math.min(
-        currentIndex - 2 + i,
-        totalQuestions - maxVisible + i
-      )
-    );
-    indices.push(questionIndex);
+  // 현재 인덱스를 중심으로 앞뒤 2개씩 표시
+  let startIndex = Math.max(0, currentIndex - 2);
+  let endIndex = Math.min(totalQuestions - 1, startIndex + maxVisible - 1);
+  
+  // 끝에서 시작점을 조정 (총 5개를 유지하기 위해)
+  if (endIndex - startIndex + 1 < maxVisible) {
+    startIndex = Math.max(0, endIndex - maxVisible + 1);
+  }
+  
+  // 연속된 인덱스 생성 (중복 방지)
+  for (let i = startIndex; i <= endIndex; i++) {
+    indices.push(i);
   }
   
   return indices;
