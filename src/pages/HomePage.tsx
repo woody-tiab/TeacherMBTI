@@ -87,8 +87,14 @@ const HomePage: React.FC = React.memo(() => {
   const handleStartTest = () => {
     try {
       console.log('새로운 테스트를 시작합니다.');
+      // 새로운 테스트 시작 시 기존 상태 삭제
+      localStorage.removeItem('mbti-test-state');
+      localStorage.removeItem('mbtiTestResult');
       // 정상적인 네비게이션 플래그 설정
       sessionStorage.setItem('normalNavigation', 'true');
+      // 상태 업데이트
+      setHasSavedTest(false);
+      setSavedProgress(0);
       navigate('/test');
     } catch (err) {
       console.error('테스트 시작 중 오류:', err);
