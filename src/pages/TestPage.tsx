@@ -28,9 +28,8 @@ const TestPage = () => {
   } = useMBTITest();
 
   const [retryKey, setRetryKey] = useState(0);
-  const [showRestoredMessage, setShowRestoredMessage] = useState(false);
 
-  // 새로운 테스트 시작 확인
+  // 테스트 초기화
   useEffect(() => {
     try {
       // localStorage에서 상태 확인
@@ -40,43 +39,12 @@ const TestPage = () => {
         console.log('저장된 상태가 없어서 새로운 테스트를 시작합니다.');
         startTest();
       } else {
-        console.log('저장된 상태가 있습니다:', savedState);
+        console.log('저장된 상태를 사용합니다.');
       }
     } catch (err) {
       console.error('테스트 초기화 중 오류:', err);
     }
   }, [startTest]);
-
-  // 페이지 로드 시 저장된 상태가 있는지 확인 (실제로 복원된 경우에만)
-  useEffect(() => {
-    try {
-      // 새로운 테스트 시작 플래그 확인
-      const isNewTestStarted = sessionStorage.getItem('newTestStarted') === 'true';
-      if (isNewTestStarted) {
-        // 플래그 제거
-        sessionStorage.removeItem('newTestStarted');
-        return; // 새로운 테스트 시작 시에는 복원 메시지 표시하지 않음
-      }
-
-      const savedState = localStorage.getItem('mbti-test-state');
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        const hasProgress = parsedState.answers?.length > 0 || parsedState.currentQuestionIndex > 0;
-        const isActuallyRestored = hasProgress && !parsedState.isComplete;
-        
-        if (isActuallyRestored) {
-          setShowRestoredMessage(true);
-          // 3초 후 메시지 숨기기
-          const timer = setTimeout(() => {
-            setShowRestoredMessage(false);
-          }, 3000);
-          return () => clearTimeout(timer);
-        }
-      }
-    } catch (error) {
-      console.warn('복원 메시지 확인 중 오류:', error);
-    }
-  }, []); // 의존성 배열을 비워서 컴포넌트 마운트 시에만 실행
 
   // 결과가 생성되면 저장 후 결과 페이지로 이동
   useEffect(() => {
@@ -190,29 +158,6 @@ const TestPage = () => {
             </p>
           </motion.div>
 
-          {/* 복원 메시지 */}
-          <AnimatePresence>
-            {showRestoredMessage && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mb-6 mx-auto max-w-md"
-              >
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center space-x-2">
-                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p className="text-sm text-green-800">
-                      이전 답변이 복원되었습니다. 계속해서 진행하세요!
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* 질문 카드 */}
           <div className="mb-8">
             <AnimatePresence mode="wait">
@@ -248,18 +193,6 @@ const TestPage = () => {
             isLoading={isLoading}
             getAnswerForQuestion={getAnswerForQuestion}
           />
-
-          {/* 저장 상태 표시 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-3 border border-gray-200"
-          >
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" aria-hidden="true" />
-              <span>자동 저장됨</span>
-            </div>
-          </motion.div>
         </div>
       </div>
     </Layout>
