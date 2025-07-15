@@ -5,7 +5,7 @@ import { Layout, Button, Card } from '../components/common';
 
 const HomePage: React.FC = React.memo(() => {
   return (
-    <Layout title="교사 MBTI 수업 스타일 분석" maxWidth="xl">
+    <Layout showHeader={false} maxWidth="xl">
       <div className="space-y-8">
         {/* 히어로 섹션 */}
         <motion.div
@@ -18,6 +18,7 @@ const HomePage: React.FC = React.memo(() => {
             subtitle="당신만의 수업 스타일을 발견해보세요"
             hover
             className="text-center bg-gradient-to-br from-blue-50 to-indigo-100 border-0"
+            titleClassName="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
           >
             <motion.p 
               className="text-gray-700 mb-8 text-lg leading-relaxed"

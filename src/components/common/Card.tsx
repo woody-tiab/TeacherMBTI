@@ -6,6 +6,7 @@ interface CardProps {
   className?: string;
   title?: string;
   subtitle?: string;
+  titleClassName?: string;
   padding?: 'sm' | 'md' | 'lg';
   shadow?: 'sm' | 'md' | 'lg' | 'xl';
   hover?: boolean;
@@ -17,6 +18,7 @@ const Card = ({
   className = '',
   title,
   subtitle,
+  titleClassName,
   padding = 'md',
   shadow = 'md',
   hover = false,
@@ -47,7 +49,7 @@ const Card = ({
       {(title || subtitle) && (
         <div className="mb-4">
           {title && (
-            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-1">
+            <h3 className={titleClassName || "text-lg md:text-xl font-semibold text-gray-900 mb-1"}>
               {title}
             </h3>
           )}
