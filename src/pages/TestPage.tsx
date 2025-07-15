@@ -7,24 +7,6 @@ import Layout from '../components/common/Layout';
 import QuestionCard from '../components/question/QuestionCard';
 import QuestionNavigation from '../components/question/QuestionNavigation';
 
-// Debounce hook for localStorage saving
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
-
 const TestPage = () => {
   const navigate = useNavigate();
   const {
@@ -45,36 +27,32 @@ const TestPage = () => {
   } = useMBTITest();
 
   const [retryKey, setRetryKey] = useState(0);
+  const [showRestoredMessage, setShowRestoredMessage] = useState(false);
 
-  // Debounced testState for localStorage saving
-  const debouncedTestState = useDebounce(testState, 500);
+  // 페이지 로드 시 저장된 상태가 있는지 확인
+  useEffect(() => {
+    const hasProgress = testState.answers.length > 0 || testState.currentQuestionIndex > 0;
+    if (hasProgress) {
+      setShowRestoredMessage(true);
+      // 3초 후 메시지 숨기기
+      const timer = setTimeout(() => {
+        setShowRestoredMessage(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // 결과가 생성되면 저장 후 결과 페이지로 이동
   useEffect(() => {
     if (result && testState.isComplete) {
       try {
         localStorage.setItem('mbtiTestResult', JSON.stringify(result));
-        localStorage.removeItem('mbti-test-progress');
         navigate('/result');
       } catch (error) {
         console.error('Failed to save result:', error);
       }
     }
   }, [result, testState.isComplete, navigate]);
-
-  // localStorage에 진행 상태 자동 저장 (debounced)
-  useEffect(() => {
-    try {
-      const savedState = {
-        currentQuestionIndex: debouncedTestState.currentQuestionIndex,
-        answers: debouncedTestState.answers,
-        progress: debouncedTestState.progress
-      };
-      localStorage.setItem('mbti-test-progress', JSON.stringify(savedState));
-    } catch (error) {
-      console.error('Failed to save progress to localStorage:', error);
-    }
-  }, [debouncedTestState]);
 
   const handleAnswerSelect = (option: MBTIQuestionOption) => {
     if (!currentQuestion) return;
@@ -91,12 +69,6 @@ const TestPage = () => {
 
   const handleComplete = () => {
     completeTest();
-    // 테스트 완료 후 저장된 진행 상태 제거
-    try {
-      localStorage.removeItem('mbti-test-progress');
-    } catch (error) {
-      console.error('Failed to remove progress from localStorage:', error);
-    }
   };
 
   const handleRetry = useCallback(() => {
@@ -181,6 +153,29 @@ const TestPage = () => {
               각 질문에 가장 적합한 답변을 선택해주세요
             </p>
           </motion.div>
+
+          {/* 복원 메시지 */}
+          <AnimatePresence>
+            {showRestoredMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-6 mx-auto max-w-md"
+              >
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm text-green-800">
+                      이전 답변이 복원되었습니다. 계속해서 진행하세요!
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* 질문 카드 */}
           <div className="mb-8">
