@@ -96,7 +96,7 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
 
   if (!result || !typeInfo) {
     return (
-      <Layout>
+      <Layout showHeader={false}>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
             <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto" />
@@ -115,7 +115,7 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   ];
 
   return (
-    <Layout>
+    <Layout showHeader={false}>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="container mx-auto px-4 py-8">
           {/* 헤더 */}
