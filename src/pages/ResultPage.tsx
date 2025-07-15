@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MBTIResult, MBTITypeInfo } from '../types/mbti';
 import { getMBTITypeInfo } from '../data/results';
@@ -20,8 +19,12 @@ interface ToastState {
   type: 'success' | 'error' | 'info';
 }
 
-const ResultPage = () => {
-  const navigate = useNavigate();
+interface ResultPageProps {
+  onNavigateToHome: () => void;
+  onNavigateToTest: () => void;
+}
+
+const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNavigateToTest }) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   
   // URL 파라미터에서 결과 정보를 가져오거나 localStorage에서 가져옵니다
   const getResultFromStorage = (): MBTIResult | null => {
@@ -37,7 +40,7 @@ const ResultPage = () => {
   
   const onRetakeTest = () => {
     localStorage.removeItem('mbtiTestResult');
-    navigate('/test');
+    onNavigateToTest();
   };
   const [typeInfo, setTypeInfo] = useState<MBTITypeInfo | null>(null);
   const [currentSection, setCurrentSection] = useState<SectionType>('overview');

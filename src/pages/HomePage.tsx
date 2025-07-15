@@ -1,41 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Layout, Button, Card } from '../components/common';
 
-const HomePage: React.FC = React.memo(() => {
-  const navigate = useNavigate();
+interface HomePageProps {
+  onNavigateToTest: () => void;
+  onNavigateToResult: () => void;
+}
+
+const HomePage: React.FC<HomePageProps> = React.memo(({ onNavigateToTest, onNavigateToResult: _unused }) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   const [hasSavedTest, setHasSavedTest] = useState(false);
   const [savedProgress, setSavedProgress] = useState(0);
-  const [refreshMessage, setRefreshMessage] = useState<{
-    type: string;
-    message: string;
-    timestamp: number;
-  } | null>(null);
 
-  // 새로고침 메시지 처리
-  useEffect(() => {
-    try {
-      const savedMessage = sessionStorage.getItem('refreshMessage');
-      if (savedMessage) {
-        const parsedMessage = JSON.parse(savedMessage);
-        // 1분 이내의 메시지만 표시
-        if (Date.now() - parsedMessage.timestamp < 60000) {
-          setRefreshMessage(parsedMessage);
-          
-          // 메시지 표시 후 5초 후 자동 제거
-          setTimeout(() => {
-            setRefreshMessage(null);
-          }, 5000);
-        }
-        
-        // 메시지 처리 후 sessionStorage에서 제거
-        sessionStorage.removeItem('refreshMessage');
-      }
-    } catch (error) {
-      console.warn('새로고침 메시지 처리 중 오류:', error);
-    }
-  }, []);
 
   // 저장된 테스트 상태 확인
   useEffect(() => {
@@ -60,14 +35,12 @@ const HomePage: React.FC = React.memo(() => {
       // 새로운 테스트 시작 시 기존 상태 삭제
       localStorage.removeItem('mbti-test-state');
       localStorage.removeItem('mbtiTestResult');
-      // 새로운 테스트 시작 플래그 설정
-      sessionStorage.setItem('newTestStarted', 'true');
       // 상태 업데이트
       setHasSavedTest(false);
       setSavedProgress(0);
       // 네비게이션
       console.log('테스트 페이지로 이동합니다.');
-      navigate('/test');
+      onNavigateToTest();
     } catch (err) {
       console.error('새로운 테스트 시작 중 오류:', err);
     }
@@ -76,9 +49,7 @@ const HomePage: React.FC = React.memo(() => {
   const handleContinueTest = () => {
     try {
       console.log('저장된 테스트를 계속 진행합니다.');
-      // 정상적인 네비게이션 플래그 설정
-      sessionStorage.setItem('normalNavigation', 'true');
-      navigate('/test');
+      onNavigateToTest();
     } catch (err) {
       console.error('테스트 계속하기 중 오류:', err);
     }
@@ -90,74 +61,18 @@ const HomePage: React.FC = React.memo(() => {
       // 새로운 테스트 시작 시 기존 상태 삭제
       localStorage.removeItem('mbti-test-state');
       localStorage.removeItem('mbtiTestResult');
-      // 정상적인 네비게이션 플래그 설정
-      sessionStorage.setItem('normalNavigation', 'true');
       // 상태 업데이트
       setHasSavedTest(false);
       setSavedProgress(0);
-      navigate('/test');
+      onNavigateToTest();
     } catch (err) {
       console.error('테스트 시작 중 오류:', err);
     }
   };
 
-  const handleCloseMessage = () => {
-    setRefreshMessage(null);
-  };
-
   return (
     <Layout showHeader={false} maxWidth="xl">
       <div className="space-y-8">
-        {/* 새로고침 알림 메시지 */}
-        <AnimatePresence>
-          {refreshMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4"
-            >
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg">
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <svg className="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-blue-800">
-                      {refreshMessage.message}
-                    </p>
-                    {hasSavedTest && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <button
-                          onClick={handleContinueTest}
-                          className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors"
-                        >
-                          이어서 진행
-                        </button>
-                        <button
-                          onClick={handleNewTest}
-                          className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600 transition-colors"
-                        >
-                          새로 시작
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={handleCloseMessage}
-                    className="flex-shrink-0 text-blue-400 hover:text-blue-600 transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* 히어로 섹션 */}
         <motion.div

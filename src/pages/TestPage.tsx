@@ -1,13 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMBTITest } from '../hooks/useMBTITest';
 import { MBTIQuestionOption, MBTIAnswer } from '../types/mbti';
 import QuestionCard from '../components/question/QuestionCard';
 import QuestionNavigation from '../components/question/QuestionNavigation';
 
-const TestPage = () => {
-  const navigate = useNavigate();
+interface TestPageProps {
+  onNavigateToHome: () => void;
+  onNavigateToResult: () => void;
+}
+
+const TestPage: React.FC<TestPageProps> = ({ onNavigateToHome: _unused, onNavigateToResult }) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   const {
     testState,
     currentQuestion,
@@ -50,12 +53,12 @@ const TestPage = () => {
     if (result && testState.isComplete) {
       try {
         localStorage.setItem('mbtiTestResult', JSON.stringify(result));
-        navigate('/result');
+        onNavigateToResult();
       } catch (error) {
         console.error('Failed to save result:', error);
       }
     }
-  }, [result, testState.isComplete, navigate]);
+  }, [result, testState.isComplete, onNavigateToResult]);
 
   const handleAnswerSelect = (option: MBTIQuestionOption) => {
     if (!currentQuestion) return;
