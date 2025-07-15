@@ -26,14 +26,20 @@ const HomePage: React.FC = React.memo(() => {
   }, []);
 
   const handleNewTest = () => {
-    // 새로운 테스트 시작 시 기존 상태 삭제
-    localStorage.removeItem('mbti-test-state');
-    localStorage.removeItem('mbtiTestResult');
-    // 상태 업데이트
-    setHasSavedTest(false);
-    setSavedProgress(0);
-    // 네비게이션
-    navigate('/test');
+    try {
+      console.log('새로운 테스트를 시작합니다.');
+      // 새로운 테스트 시작 시 기존 상태 삭제
+      localStorage.removeItem('mbti-test-state');
+      localStorage.removeItem('mbtiTestResult');
+      // 상태 업데이트
+      setHasSavedTest(false);
+      setSavedProgress(0);
+      // 네비게이션
+      console.log('테스트 페이지로 이동합니다.');
+      navigate('/test');
+    } catch (err) {
+      console.error('새로운 테스트 시작 중 오류:', err);
+    }
   };
   return (
     <Layout showHeader={false} maxWidth="xl">

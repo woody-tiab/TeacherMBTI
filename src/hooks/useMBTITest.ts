@@ -115,10 +115,15 @@ export const useMBTITest = (): UseMBTITestReturn => {
 
   // 테스트 시작
   const startTest = useCallback(() => {
-    const newState = initialTestState;
-    setTestState(newState);
-    setResult(null);
-    setError(null);
+    try {
+      const newState = initialTestState;
+      setTestState(newState);
+      setResult(null);
+      setError(null);
+    } catch (err) {
+      console.error('startTest error:', err);
+      setError(err instanceof Error ? err.message : '테스트 시작 중 오류가 발생했습니다.');
+    }
   }, []);
 
   // 질문 답변

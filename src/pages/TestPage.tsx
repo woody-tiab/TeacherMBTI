@@ -32,11 +32,18 @@ const TestPage = () => {
 
   // 새로운 테스트 시작 확인
   useEffect(() => {
-    // localStorage에서 상태 확인
-    const savedState = localStorage.getItem('mbti-test-state');
-    if (!savedState) {
-      // 저장된 상태가 없으면 새로운 테스트 시작
-      startTest();
+    try {
+      // localStorage에서 상태 확인
+      const savedState = localStorage.getItem('mbti-test-state');
+      if (!savedState) {
+        // 저장된 상태가 없으면 새로운 테스트 시작
+        console.log('저장된 상태가 없어서 새로운 테스트를 시작합니다.');
+        startTest();
+      } else {
+        console.log('저장된 상태가 있습니다:', savedState);
+      }
+    } catch (err) {
+      console.error('테스트 초기화 중 오류:', err);
     }
   }, [startTest]);
 
