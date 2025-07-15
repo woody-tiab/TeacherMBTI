@@ -27,38 +27,26 @@ const RefreshHandler: React.FC = () => {
   const location = useLocation();
   
   useEffect(() => {
-    // 메인페이지인 경우 새로고침 감지 로직을 실행하지 않음
-    if (location.pathname === '/') return;
+    // 메인페이지인 경우 앱 로드 플래그 설정
+    if (location.pathname === '/') {
+      sessionStorage.setItem('appLoaded', 'true');
+      return;
+    }
     
     // 정상적인 네비게이션 플래그 확인
-    const normalNavigation = sessionStorage.getItem('normalNavigation') === 'true';
-    const newTestStarted = sessionStorage.getItem('newTestStarted') === 'true';
+    const normalNavigation = sessionStorage.getItem('normalNavigation');
+    const appLoaded = sessionStorage.getItem('appLoaded');
     
-    if (normalNavigation || newTestStarted) {
+    if (normalNavigation === 'true') {
       // 플래그 제거
       sessionStorage.removeItem('normalNavigation');
-      sessionStorage.removeItem('newTestStarted');
-      console.log('🎯 정상적인 네비게이션 감지');
+      console.log('🎯 정상적인 네비게이션 확인됨');
       return;
     }
     
-    // 더 정확한 새로고침 감지 로직
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    const isRefresh = navigation && navigation.type === 'reload';
-    
-    // 추가적인 새로고침 감지 방법들
-    const hasSessionHistory = window.history.length > 1;
-    const hasReferrer = document.referrer && document.referrer.includes(window.location.origin);
-    
-    // 다음 조건 중 하나라도 만족하면 정상적인 네비게이션으로 간주
-    if (!isRefresh && (hasSessionHistory || hasReferrer)) {
-      console.log('🎯 정상적인 네비게이션 감지 (히스토리 또는 레퍼러 존재)');
-      return;
-    }
-    
-    // 새로고침으로 판단되는 경우에만 리다이렉트 처리
-    if (isRefresh) {
-      console.log('🔄 새로고침 감지됨, 현재 경로:', location.pathname);
+    // 앱이 로드되지 않은 상태에서 서브 페이지에 접근 (새로고침 또는 직접 접근)
+    if (!appLoaded) {
+      console.log('🔄 새로고침 또는 직접 접근 감지됨, 현재 경로:', location.pathname);
       
       // 테스트 페이지에서 새로고침한 경우
       if (location.pathname === '/test') {
@@ -71,7 +59,7 @@ const RefreshHandler: React.FC = () => {
             
             if (hasProgress) {
               console.log('📊 진행 중인 테스트가 있습니다. 테스트 페이지를 유지합니다.');
-              // 테스트 진행 중이면 현재 페이지 유지
+              sessionStorage.setItem('appLoaded', 'true');
               return;
             }
           } catch (error) {
@@ -86,7 +74,7 @@ const RefreshHandler: React.FC = () => {
         
         if (savedResult) {
           console.log('📊 저장된 결과가 있습니다. 결과 페이지를 유지합니다.');
-          // 결과가 있으면 현재 페이지 유지
+          sessionStorage.setItem('appLoaded', 'true');
           return;
         }
       }
@@ -102,6 +90,8 @@ const RefreshHandler: React.FC = () => {
       }));
       
       navigate('/', { replace: true });
+    } else {
+      console.log('🎯 정상적인 상태 확인됨');
     }
   }, [location.pathname, navigate]);
 
