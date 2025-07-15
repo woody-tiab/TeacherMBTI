@@ -37,6 +37,14 @@ const RefreshHandler: React.FC = () => {
       // 메인페이지가 아닌 경우에만 새로고침 감지 로직 실행
       if (location.pathname === '/') return;
       
+      // 새로운 테스트 시작 플래그 확인 (정상적인 네비게이션인지 확인)
+      const newTestStarted = sessionStorage.getItem('newTestStarted');
+      if (newTestStarted) {
+        sessionStorage.removeItem('newTestStarted');
+        console.log('🎯 정상적인 테스트 시작, 새로고침 감지 건너뛰기');
+        return;
+      }
+      
       let isRefresh = false;
       
       // Modern PerformanceNavigationTiming API 사용
@@ -51,14 +59,19 @@ const RefreshHandler: React.FC = () => {
       if (!isRefresh) {
         const sessionKey = 'app-session-id';
         const currentSessionId = sessionStorage.getItem(sessionKey);
-        const newSessionId = Date.now().toString();
         
         if (!currentSessionId) {
-          // 새로운 세션 시작
-          sessionStorage.setItem(sessionKey, newSessionId);
+          // 새로운 세션 시작 - 새로고침이 아님
+          sessionStorage.setItem(sessionKey, Date.now().toString());
+          isRefresh = false;
         } else {
-          // 기존 세션이 있지만 페이지가 새로 로드된 경우 (새로고침)
-          isRefresh = true;
+          // 기존 세션이 있는 상태에서 페이지가 새로 로드된 경우
+          // 페이지 로드 타입 확인 (새로고침인지 뒤로가기인지)
+          const pageAccessedByReload = (
+            (window.performance.navigation && window.performance.navigation.type === 1) ||
+            (window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming)?.type === 'reload'
+          );
+          isRefresh = pageAccessedByReload;
         }
       }
       
