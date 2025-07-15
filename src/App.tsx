@@ -30,60 +30,79 @@ const RefreshHandler: React.FC = () => {
     // 메인페이지인 경우 새로고침 감지 로직을 실행하지 않음
     if (location.pathname === '/') return;
     
-    // 페이지 로드 타입 확인
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    const isRefresh = navigation && navigation.type === 'reload';
+    // 정상적인 네비게이션 플래그 확인
+    const normalNavigation = sessionStorage.getItem('normalNavigation') === 'true';
+    const newTestStarted = sessionStorage.getItem('newTestStarted') === 'true';
     
-    // 새로고침이 아닌 경우 (정상적인 네비게이션)
-    if (!isRefresh) {
+    if (normalNavigation || newTestStarted) {
+      // 플래그 제거
+      sessionStorage.removeItem('normalNavigation');
+      sessionStorage.removeItem('newTestStarted');
       console.log('🎯 정상적인 네비게이션 감지');
       return;
     }
     
-    console.log('🔄 새로고침 감지됨, 현재 경로:', location.pathname);
+    // 더 정확한 새로고침 감지 로직
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const isRefresh = navigation && navigation.type === 'reload';
     
-    // 테스트 페이지에서 새로고침한 경우
-    if (location.pathname === '/test') {
-      const savedState = localStorage.getItem('mbti-test-state');
+    // 추가적인 새로고침 감지 방법들
+    const hasSessionHistory = window.history.length > 1;
+    const hasReferrer = document.referrer && document.referrer.includes(window.location.origin);
+    
+    // 다음 조건 중 하나라도 만족하면 정상적인 네비게이션으로 간주
+    if (!isRefresh && (hasSessionHistory || hasReferrer)) {
+      console.log('🎯 정상적인 네비게이션 감지 (히스토리 또는 레퍼러 존재)');
+      return;
+    }
+    
+    // 새로고침으로 판단되는 경우에만 리다이렉트 처리
+    if (isRefresh) {
+      console.log('🔄 새로고침 감지됨, 현재 경로:', location.pathname);
       
-      if (savedState) {
-        try {
-          const parsedState = JSON.parse(savedState);
-          const hasProgress = parsedState.answers?.length > 0 || parsedState.currentQuestionIndex > 0;
-          
-          if (hasProgress) {
-            console.log('📊 진행 중인 테스트가 있습니다. 테스트 페이지를 유지합니다.');
-            // 테스트 진행 중이면 현재 페이지 유지
-            return;
+      // 테스트 페이지에서 새로고침한 경우
+      if (location.pathname === '/test') {
+        const savedState = localStorage.getItem('mbti-test-state');
+        
+        if (savedState) {
+          try {
+            const parsedState = JSON.parse(savedState);
+            const hasProgress = parsedState.answers?.length > 0 || parsedState.currentQuestionIndex > 0;
+            
+            if (hasProgress) {
+              console.log('📊 진행 중인 테스트가 있습니다. 테스트 페이지를 유지합니다.');
+              // 테스트 진행 중이면 현재 페이지 유지
+              return;
+            }
+          } catch (error) {
+            console.warn('저장된 상태 분석 중 오류:', error);
           }
-        } catch (error) {
-          console.warn('저장된 상태 분석 중 오류:', error);
         }
       }
-    }
-    
-    // 결과 페이지에서 새로고침한 경우
-    if (location.pathname === '/result') {
-      const savedResult = localStorage.getItem('mbti-test-result');
       
-      if (savedResult) {
-        console.log('📊 저장된 결과가 있습니다. 결과 페이지를 유지합니다.');
-        // 결과가 있으면 현재 페이지 유지
-        return;
+      // 결과 페이지에서 새로고침한 경우
+      if (location.pathname === '/result') {
+        const savedResult = localStorage.getItem('mbti-test-result');
+        
+        if (savedResult) {
+          console.log('📊 저장된 결과가 있습니다. 결과 페이지를 유지합니다.');
+          // 결과가 있으면 현재 페이지 유지
+          return;
+        }
       }
+      
+      // 그 외의 경우 메인페이지로 리다이렉트
+      console.log('🏠 메인페이지로 리다이렉트');
+      const message = '페이지를 새로고침하여 메인페이지로 이동했습니다.';
+      
+      sessionStorage.setItem('refreshMessage', JSON.stringify({
+        type: 'info',
+        message,
+        timestamp: Date.now()
+      }));
+      
+      navigate('/', { replace: true });
     }
-    
-    // 그 외의 경우 메인페이지로 리다이렉트
-    console.log('🏠 메인페이지로 리다이렉트');
-    const message = '페이지를 새로고침하여 메인페이지로 이동했습니다.';
-    
-    sessionStorage.setItem('refreshMessage', JSON.stringify({
-      type: 'info',
-      message,
-      timestamp: Date.now()
-    }));
-    
-    navigate('/', { replace: true });
   }, [location.pathname, navigate]);
 
   return null;
