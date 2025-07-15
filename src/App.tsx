@@ -69,11 +69,14 @@ const AnimatedRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   console.log('🚀 App 컴포넌트 렌더링 시작')
-  console.log('📍 Router basename:', '/TeacherMBTI')
+  
+  // 개발 환경과 프로덕션 환경에 따라 basename 설정
+  const basename = window.location.hostname === 'localhost' ? '' : '/TeacherMBTI';
+  console.log('📍 Router basename:', basename)
   
   return (
     <ErrorBoundary>
-      <Router basename="/TeacherMBTI">
+      <Router basename={basename}>
         <div className="min-h-screen bg-gray-50">
           {/* 네비게이션 바 */}
           <Navigation />

@@ -198,7 +198,7 @@ const TestPage = () => {
           {/* 질문 카드 */}
           <div className="mb-8">
             <AnimatePresence mode="wait">
-              {currentQuestion && (
+              {currentQuestion ? (
                 <QuestionCard
                   key={currentQuestion.id}
                   question={currentQuestion}
@@ -207,6 +207,10 @@ const TestPage = () => {
                   questionNumber={testState.currentQuestionIndex + 1}
                   totalQuestions={testState.totalQuestions}
                 />
+              ) : (
+                <div className="text-center p-8">
+                  <p className="text-gray-600">질문을 불러오는 중...</p>
+                </div>
               )}
             </AnimatePresence>
           </div>
