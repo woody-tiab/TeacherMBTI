@@ -22,6 +22,9 @@ export default defineConfig({
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]'
+      },
+      input: {
+        main: 'index.html'
       }
     },
     // 파일 압축 설정
@@ -57,5 +60,6 @@ export default defineConfig({
       'react-router-dom',
       'framer-motion'
     ]
-  }
+  },
+  publicDir: 'public'
 }) 
