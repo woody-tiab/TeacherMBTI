@@ -143,7 +143,13 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                         aria-label={`${dimension.leftType}: ${Math.round(dimension.leftValue)}%`}
                       >
                         {dimension.leftValue > 20 && (
-                          <div className="absolute inset-0 flex items-center justify-center px-2">
+                          <div 
+                            className="absolute top-1/2 transform -translate-y-1/2"
+                            style={{ 
+                              left: `${dimension.leftValue / 2}%`,
+                              transform: 'translateX(-50%) translateY(-50%)'
+                            }}
+                          >
                             <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite">
                               {Math.round(dimension.leftValue)}%
                             </span>
@@ -163,7 +169,13 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                         aria-label={`${dimension.rightType}: ${Math.round(dimension.rightValue)}%`}
                       >
                         {dimension.rightValue > 20 && (
-                          <div className="absolute inset-0 flex items-center justify-center px-2">
+                          <div 
+                            className="absolute top-1/2 transform -translate-y-1/2"
+                            style={{ 
+                              left: `${100 - dimension.rightValue / 2}%`,
+                              transform: 'translateX(-50%) translateY(-50%)'
+                            }}
+                          >
                             <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite">
                               {Math.round(dimension.rightValue)}%
                             </span>
