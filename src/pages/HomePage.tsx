@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layout, Button, Card } from '../components/common';
 
 const HomePage: React.FC = React.memo(() => {
+  const navigate = useNavigate();
   const [hasSavedTest, setHasSavedTest] = useState(false);
   const [savedProgress, setSavedProgress] = useState(0);
 
@@ -33,7 +34,7 @@ const HomePage: React.FC = React.memo(() => {
     setHasSavedTest(false);
     setSavedProgress(0);
     // 네비게이션
-    window.location.href = '/TeacherMBTI/test';
+    navigate('/test');
   };
   return (
     <Layout showHeader={false} maxWidth="xl">
