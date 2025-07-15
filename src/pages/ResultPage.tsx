@@ -108,10 +108,10 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   }
 
   const sections = [
-    { id: 'overview' as SectionType, label: '결과 개요', icon: '📊' },
-    { id: 'details' as SectionType, label: '상세 분석', icon: '📋' },
-    { id: 'style' as SectionType, label: '수업 스타일', icon: '🎯' },
-    { id: 'chart' as SectionType, label: '성향 분석', icon: '📈' }
+    { id: 'overview' as SectionType, label: '개요', icon: '📊' },
+    { id: 'details' as SectionType, label: '분석', icon: '📋' },
+    { id: 'style' as SectionType, label: '스타일', icon: '🎯' },
+    { id: 'chart' as SectionType, label: '성향', icon: '📈' }
   ];
 
   return (
@@ -140,13 +140,13 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
             transition={{ delay: 0.2, duration: 0.5 }}
             className="flex justify-center mb-8"
           >
-            <div className="bg-white rounded-full p-2 shadow-lg border border-gray-200">
-              <div className="flex space-x-1">
+            <div className="bg-white rounded-full p-1.5 shadow-lg border border-gray-200 max-w-full overflow-x-auto">
+              <div className="flex space-x-0.5 min-w-fit">
                 {sections.map((section) => (
                   <button
                     key={section.id}
                     onClick={() => setCurrentSection(section.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap flex items-center ${
                       currentSection === section.id
                         ? 'text-white shadow-md'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -155,7 +155,7 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
                       backgroundColor: currentSection === section.id ? typeInfo.color : 'transparent'
                     }}
                   >
-                    <span className="mr-2">{section.icon}</span>
+                    <span className="mr-1">{section.icon}</span>
                     {section.label}
                   </button>
                 ))}
