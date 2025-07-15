@@ -18,6 +18,7 @@ const TestPage = () => {
     canGoPrev,
     isComplete,
     hasAnswerForCurrentQuestion,
+    startTest,
     answerQuestion,
     nextQuestion,
     prevQuestion,
@@ -29,6 +30,16 @@ const TestPage = () => {
   const [retryKey, setRetryKey] = useState(0);
   const [showRestoredMessage, setShowRestoredMessage] = useState(false);
 
+  // 새로운 테스트 시작 확인
+  useEffect(() => {
+    // localStorage에서 상태 확인
+    const savedState = localStorage.getItem('mbti-test-state');
+    if (!savedState) {
+      // 저장된 상태가 없으면 새로운 테스트 시작
+      startTest();
+    }
+  }, [startTest]);
+
   // 페이지 로드 시 저장된 상태가 있는지 확인
   useEffect(() => {
     const hasProgress = testState.answers.length > 0 || testState.currentQuestionIndex > 0;
@@ -39,15 +50,8 @@ const TestPage = () => {
         setShowRestoredMessage(false);
       }, 3000);
       return () => clearTimeout(timer);
-    } else {
-      // 저장된 상태가 없고 새로고침으로 접근한 경우 홈으로 리다이렉트
-      // 단, 처음 테스트 시작 시에는 리다이렉트하지 않음
-      const isDirectAccess = window.performance.navigation.type === 1; // 새로고침
-      if (isDirectAccess && testState.answers.length === 0 && testState.currentQuestionIndex === 0) {
-        navigate('/', { replace: true });
-      }
     }
-  }, [testState.answers.length, testState.currentQuestionIndex, navigate]);
+  }, [testState.answers.length, testState.currentQuestionIndex]);
 
   // 결과가 생성되면 저장 후 결과 페이지로 이동
   useEffect(() => {

@@ -24,10 +24,16 @@ const HomePage: React.FC = React.memo(() => {
     }
   }, []);
 
-  const handleNewTest = () => {
+  const handleNewTest = (e: React.MouseEvent) => {
+    e.preventDefault();
     // 새로운 테스트 시작 시 기존 상태 삭제
     localStorage.removeItem('mbti-test-state');
     localStorage.removeItem('mbtiTestResult');
+    // 상태 업데이트
+    setHasSavedTest(false);
+    setSavedProgress(0);
+    // 네비게이션
+    window.location.href = '/TeacherMBTI/test';
   };
   return (
     <Layout showHeader={false} maxWidth="xl">
