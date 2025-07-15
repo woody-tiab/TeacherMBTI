@@ -25,8 +25,7 @@ const HomePage: React.FC = React.memo(() => {
     }
   }, []);
 
-  const handleNewTest = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleNewTest = () => {
     // 새로운 테스트 시작 시 기존 상태 삭제
     localStorage.removeItem('mbti-test-state');
     localStorage.removeItem('mbtiTestResult');
@@ -86,15 +85,14 @@ const HomePage: React.FC = React.memo(() => {
                         📋 테스트 계속하기
                       </Button>
                     </Link>
-                    <Link to="/test" onClick={handleNewTest}>
-                      <Button 
-                        variant="secondary" 
-                        size="lg"
-                        className="px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                      >
-                        🆕 새로 시작하기
-                      </Button>
-                    </Link>
+                    <Button 
+                      variant="secondary" 
+                      size="lg"
+                      onClick={handleNewTest}
+                      className="px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    >
+                      🆕 새로 시작하기
+                    </Button>
                   </div>
                 </div>
               ) : (
