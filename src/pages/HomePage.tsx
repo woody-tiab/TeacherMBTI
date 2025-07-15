@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Layout, Button, Card } from '../components/common';
 
@@ -76,9 +76,22 @@ const HomePage: React.FC = React.memo(() => {
   const handleContinueTest = () => {
     try {
       console.log('저장된 테스트를 계속 진행합니다.');
+      // 정상적인 네비게이션 플래그 설정
+      sessionStorage.setItem('normalNavigation', 'true');
       navigate('/test');
     } catch (err) {
       console.error('테스트 계속하기 중 오류:', err);
+    }
+  };
+
+  const handleStartTest = () => {
+    try {
+      console.log('새로운 테스트를 시작합니다.');
+      // 정상적인 네비게이션 플래그 설정
+      sessionStorage.setItem('normalNavigation', 'true');
+      navigate('/test');
+    } catch (err) {
+      console.error('테스트 시작 중 오류:', err);
     }
   };
 
@@ -178,15 +191,14 @@ const HomePage: React.FC = React.memo(() => {
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link to="/test">
-                      <Button 
-                        variant="primary" 
-                        size="lg"
-                        className="px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-gradient-to-r from-green-500 to-blue-600"
-                      >
-                        📋 테스트 계속하기
-                      </Button>
-                    </Link>
+                    <Button 
+                      variant="primary" 
+                      size="lg"
+                      onClick={handleContinueTest}
+                      className="px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-gradient-to-r from-green-500 to-blue-600"
+                    >
+                      📋 테스트 계속하기
+                    </Button>
                     <Button 
                       variant="secondary" 
                       size="lg"
@@ -198,15 +210,14 @@ const HomePage: React.FC = React.memo(() => {
                   </div>
                 </div>
               ) : (
-                <Link to="/test">
-                  <Button 
-                    variant="primary" 
-                    size="lg"
-                    className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-600"
-                  >
-                    🎯 테스트 시작하기
-                  </Button>
-                </Link>
+                <Button 
+                  variant="primary" 
+                  size="lg"
+                  onClick={handleStartTest}
+                  className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-600"
+                >
+                  🎯 테스트 시작하기
+                </Button>
               )}
             </motion.div>
 
@@ -289,11 +300,13 @@ const HomePage: React.FC = React.memo(() => {
               <p className="text-gray-600 mb-4">
                 지금 바로 시작해서 당신만의 교육 스타일을 발견해보세요!
               </p>
-              <Link to="/test">
-                <Button variant="outline" className="px-6 py-2">
-                  테스트 바로 시작하기 →
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                onClick={handleStartTest}
+                className="px-6 py-2"
+              >
+                테스트 바로 시작하기 →
+              </Button>
             </div>
           </Card>
         </motion.div>
