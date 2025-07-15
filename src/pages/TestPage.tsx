@@ -40,7 +40,7 @@ const TestPage = () => {
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [testState.answers.length, testState.currentQuestionIndex]);
 
   // 결과가 생성되면 저장 후 결과 페이지로 이동
   useEffect(() => {
