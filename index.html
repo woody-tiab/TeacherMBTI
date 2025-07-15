@@ -48,8 +48,9 @@
             query[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
           });
           if (query.p !== undefined) {
+            var basePath = l.pathname.replace(/\/$/, ''); // 끝의 / 제거
             window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + (query.p || '') +
+              basePath + (query.p || '') +
               (query.q ? ('?' + query.q) : '') +
               l.hash
             );
