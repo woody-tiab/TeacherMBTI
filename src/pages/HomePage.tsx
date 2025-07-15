@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layout, Button, Card } from '../components/common';
 
 const HomePage: React.FC = React.memo(() => {
+  const [hasSavedTest, setHasSavedTest] = useState(false);
+  const [savedProgress, setSavedProgress] = useState(0);
+
+  // 저장된 테스트 상태 확인
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('mbti-test-state');
+      if (saved) {
+        const parsedState = JSON.parse(saved);
+        const hasProgress = parsedState.answers?.length > 0 || parsedState.currentQuestionIndex > 0;
+        if (hasProgress && !parsedState.isComplete) {
+          setHasSavedTest(true);
+          setSavedProgress(Math.round((parsedState.answers?.length || 0) / 24 * 100));
+        }
+      }
+    } catch (error) {
+      console.warn('저장된 테스트 상태를 확인할 수 없습니다:', error);
+    }
+  }, []);
+
+  const handleNewTest = () => {
+    // 새로운 테스트 시작 시 기존 상태 삭제
+    localStorage.removeItem('mbti-test-state');
+    localStorage.removeItem('mbtiTestResult');
+  };
   return (
     <Layout showHeader={false} maxWidth="xl">
       <div className="space-y-8">
@@ -37,15 +62,45 @@ const HomePage: React.FC = React.memo(() => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
             >
-                             <Link to="/test">
-                 <Button 
-                   variant="primary" 
-                   size="lg"
-                   className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-600"
-                 >
-                   🎯 테스트 시작하기
-                 </Button>
-               </Link>
+              {hasSavedTest ? (
+                <div className="space-y-4">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                    <p className="text-amber-800 font-medium">
+                      🔄 진행 중인 테스트가 있습니다 ({savedProgress}% 완료)
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link to="/test">
+                      <Button 
+                        variant="primary" 
+                        size="lg"
+                        className="px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-gradient-to-r from-green-500 to-blue-600"
+                      >
+                        📋 테스트 계속하기
+                      </Button>
+                    </Link>
+                    <Link to="/test" onClick={handleNewTest}>
+                      <Button 
+                        variant="secondary" 
+                        size="lg"
+                        className="px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                      >
+                        🆕 새로 시작하기
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <Link to="/test">
+                  <Button 
+                    variant="primary" 
+                    size="lg"
+                    className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-600"
+                  >
+                    🎯 테스트 시작하기
+                  </Button>
+                </Link>
+              )}
             </motion.div>
 
             <motion.div 

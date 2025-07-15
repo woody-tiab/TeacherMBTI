@@ -39,8 +39,15 @@ const TestPage = () => {
         setShowRestoredMessage(false);
       }, 3000);
       return () => clearTimeout(timer);
+    } else {
+      // 저장된 상태가 없고 새로고침으로 접근한 경우 홈으로 리다이렉트
+      // 단, 처음 테스트 시작 시에는 리다이렉트하지 않음
+      const isDirectAccess = window.performance.navigation.type === 1; // 새로고침
+      if (isDirectAccess && testState.answers.length === 0 && testState.currentQuestionIndex === 0) {
+        navigate('/', { replace: true });
+      }
     }
-  }, [testState.answers.length, testState.currentQuestionIndex]);
+  }, [testState.answers.length, testState.currentQuestionIndex, navigate]);
 
   // 결과가 생성되면 저장 후 결과 페이지로 이동
   useEffect(() => {
