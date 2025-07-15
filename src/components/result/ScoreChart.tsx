@@ -144,7 +144,7 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                       >
                         {dimension.leftValue > 20 && (
                           <div className="absolute inset-0 flex items-center justify-center px-2">
-                            <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite" style={{ textAlign: 'center' }}>
+                            <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite">
                               {Math.round(dimension.leftValue)}%
                             </span>
                           </div>
@@ -164,7 +164,7 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                       >
                         {dimension.rightValue > 20 && (
                           <div className="absolute inset-0 flex items-center justify-center px-2">
-                            <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite" style={{ textAlign: 'center' }}>
+                            <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite">
                               {Math.round(dimension.rightValue)}%
                             </span>
                           </div>

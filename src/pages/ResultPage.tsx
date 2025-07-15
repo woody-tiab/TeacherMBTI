@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MBTIResult, MBTITypeInfo } from '../types/mbti';
 import { getMBTITypeInfo } from '../data/results';
+import { useMBTITest } from '../hooks/useMBTITest';
 import Layout from '../components/common/Layout';
 import Button from '../components/common/Button';
 import Toast from '../components/common/Toast';
@@ -26,6 +27,9 @@ interface ResultPageProps {
 
 const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNavigateToTest }) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   
+  // useMBTITest 훅을 사용하여 resetTest 함수 가져오기
+  const { resetTest } = useMBTITest();
+  
   // URL 파라미터에서 결과 정보를 가져오거나 localStorage에서 가져옵니다
   const getResultFromStorage = (): MBTIResult | null => {
     try {
@@ -39,7 +43,11 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   const result = getResultFromStorage();
   
   const onRetakeTest = () => {
+    // 테스트를 완전히 초기화
+    resetTest();
+    // 결과 localStorage도 제거
     localStorage.removeItem('mbtiTestResult');
+    // 테스트 페이지로 이동
     onNavigateToTest();
   };
   const [typeInfo, setTypeInfo] = useState<MBTITypeInfo | null>(null);
@@ -196,40 +204,46 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
             className="mt-12 px-4"
           >
             <div className="max-w-5xl mx-auto">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 flex-wrap">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={onRetakeTest}
-                  className="flex items-center space-x-2 w-full sm:w-auto sm:min-w-[180px] sm:max-w-[220px] lg:max-w-[240px]"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  <span>다시 테스트하기</span>
-                </Button>
+              <div className="space-y-4">
+                {/* 첫 번째 줄: 다시 테스트하기 */}
+                <div className="flex justify-center">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    onClick={onRetakeTest}
+                    className="flex items-center space-x-2 w-full sm:w-auto sm:min-w-[240px] sm:max-w-[280px]"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>다시 테스트하기</span>
+                  </Button>
+                </div>
 
-                <ShareButton
-                  result={result}
-                  typeInfo={typeInfo}
-                  onShareSuccess={handleShareSuccess}
-                  onShareError={handleShareError}
-                  variant="secondary"
-                  size="lg"
-                  className="w-full sm:w-auto sm:min-w-[180px] sm:max-w-[220px] lg:max-w-[240px]"
-                />
+                {/* 두 번째 줄: 결과 공유와 저장하기 */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+                  <ShareButton
+                    result={result}
+                    typeInfo={typeInfo}
+                    onShareSuccess={handleShareSuccess}
+                    onShareError={handleShareError}
+                    variant="secondary"
+                    size="lg"
+                    className="w-full sm:w-auto sm:min-w-[180px] sm:max-w-[220px]"
+                  />
 
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleSaveResult}
-                  className="flex items-center space-x-2 w-full sm:w-auto sm:min-w-[180px] sm:max-w-[220px] lg:max-w-[240px]"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                  </svg>
-                  <span>결과 저장하기</span>
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleSaveResult}
+                    className="flex items-center space-x-2 w-full sm:w-auto sm:min-w-[180px] sm:max-w-[220px]"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    <span>결과 저장하기</span>
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>
