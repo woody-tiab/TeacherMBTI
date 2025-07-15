@@ -119,7 +119,6 @@ export const useMBTITest = (): UseMBTITestReturn => {
     setTestState(newState);
     setResult(null);
     setError(null);
-    saveTestState(newState);
   }, []);
 
   // 질문 답변
@@ -189,9 +188,6 @@ export const useMBTITest = (): UseMBTITestReturn => {
         ...prev,
         isComplete: true
       }));
-
-      // 테스트 완료 후 저장된 상태 제거
-      localStorage.removeItem(STORAGE_KEY);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : '결과 계산 중 오류가 발생했습니다.');
