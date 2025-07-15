@@ -136,15 +136,15 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                     >
                       {/* 왼쪽 (첫 번째 성향) */}
                       <motion.div
-                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-gray-400 to-gray-500"
+                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-gray-400 to-gray-500 rounded-l-full"
                         initial={{ width: "50%" }}
                         animate={{ width: `${dimension.leftValue}%` }}
                         transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 + index * 0.2 }}
                         aria-label={`${dimension.leftType}: ${Math.round(dimension.leftValue)}%`}
                       >
                         {dimension.leftValue > 20 && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-white font-medium text-sm whitespace-nowrap" aria-live="polite">
+                          <div className="absolute inset-0 flex items-center justify-center px-2">
+                            <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite" style={{ textAlign: 'center' }}>
                               {Math.round(dimension.leftValue)}%
                             </span>
                           </div>
@@ -153,7 +153,7 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
 
                       {/* 오른쪽 (두 번째 성향) */}
                       <motion.div
-                        className="absolute right-0 top-0 h-full"
+                        className="absolute right-0 top-0 h-full rounded-r-full"
                         style={{ 
                           background: `linear-gradient(to left, ${typeColor}, ${typeColor}88)`
                         }}
@@ -163,8 +163,8 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                         aria-label={`${dimension.rightType}: ${Math.round(dimension.rightValue)}%`}
                       >
                         {dimension.rightValue > 20 && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-white font-medium text-sm whitespace-nowrap" aria-live="polite">
+                          <div className="absolute inset-0 flex items-center justify-center px-2">
+                            <span className="text-white font-semibold text-sm whitespace-nowrap select-none" aria-live="polite" style={{ textAlign: 'center' }}>
                               {Math.round(dimension.rightValue)}%
                             </span>
                           </div>
