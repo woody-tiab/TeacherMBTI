@@ -1,23 +1,49 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>교사 MBTI 수업 스타일 분석</title>
-    <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // https://github.com/rafgraph/spa-github-pages
-      var pathSegmentsToKeep = 1;
-
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>교사 MBTI 수업 스타일 분석</title>
+  <script>
+    // GitHub Pages SPA 라우팅 지원
+    // 404 페이지에서 올바른 경로로 리다이렉트
+    (function() {
       var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
-    </script>
-  </head>
-  <body>
-  </body>
+      var pathSegmentsToKeep = 1; // GitHub Pages repo name을 위해 1 유지
+      
+      // 현재 경로에서 repo name 이후의 경로 추출
+      var pathArray = l.pathname.slice(1).split('/');
+      var currentPath = pathArray.slice(pathSegmentsToKeep).join('/');
+      
+      // 기본 경로 설정 (repo name까지)
+      var basePath = '/' + pathArray.slice(0, pathSegmentsToKeep).join('/');
+      
+      // 리다이렉트 URL 생성
+      var redirectUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + basePath + '/';
+      
+      // 경로가 있으면 쿼리 파라미터로 추가
+      if (currentPath) {
+        redirectUrl += '?p=/' + currentPath.replace(/&/g, '~and~');
+      }
+      
+      // 기존 쿼리 스트링이 있으면 추가
+      if (l.search) {
+        redirectUrl += (currentPath ? '&q=' : '?q=') + l.search.slice(1).replace(/&/g, '~and~');
+      }
+      
+      // 해시가 있으면 추가
+      if (l.hash) {
+        redirectUrl += l.hash;
+      }
+      
+      // 리다이렉트 실행
+      l.replace(redirectUrl);
+    })();
+  </script>
+</head>
+<body>
+  <div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">
+    <h2>페이지를 로딩 중입니다...</h2>
+    <p>잠시만 기다려주세요.</p>
+  </div>
+</body>
 </html> 
