@@ -25,7 +25,7 @@ const HomePage: React.FC = React.memo(() => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
             >
-              24개의 교육 상황별 질문을 통해 당신의 수업 스타일을 
+              24개의 교육 상황별 질문을 통해 당신의 수업 스타일을  
               <br className="hidden sm:block" />
               <span className="font-semibold text-indigo-600">16가지 MBTI 타입</span>으로 분석해드립니다.
             </motion.p>
