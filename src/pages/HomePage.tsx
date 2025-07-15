@@ -31,6 +31,8 @@ const HomePage: React.FC = React.memo(() => {
       // 새로운 테스트 시작 시 기존 상태 삭제
       localStorage.removeItem('mbti-test-state');
       localStorage.removeItem('mbtiTestResult');
+      // 새로운 테스트 시작 플래그 설정
+      sessionStorage.setItem('newTestStarted', 'true');
       // 상태 업데이트
       setHasSavedTest(false);
       setSavedProgress(0);

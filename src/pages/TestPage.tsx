@@ -47,18 +47,36 @@ const TestPage = () => {
     }
   }, [startTest]);
 
-  // 페이지 로드 시 저장된 상태가 있는지 확인
+  // 페이지 로드 시 저장된 상태가 있는지 확인 (실제로 복원된 경우에만)
   useEffect(() => {
-    const hasProgress = testState.answers.length > 0 || testState.currentQuestionIndex > 0;
-    if (hasProgress) {
-      setShowRestoredMessage(true);
-      // 3초 후 메시지 숨기기
-      const timer = setTimeout(() => {
-        setShowRestoredMessage(false);
-      }, 3000);
-      return () => clearTimeout(timer);
+    try {
+      // 새로운 테스트 시작 플래그 확인
+      const isNewTestStarted = sessionStorage.getItem('newTestStarted') === 'true';
+      if (isNewTestStarted) {
+        // 플래그 제거
+        sessionStorage.removeItem('newTestStarted');
+        return; // 새로운 테스트 시작 시에는 복원 메시지 표시하지 않음
+      }
+
+      const savedState = localStorage.getItem('mbti-test-state');
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        const hasProgress = parsedState.answers?.length > 0 || parsedState.currentQuestionIndex > 0;
+        const isActuallyRestored = hasProgress && !parsedState.isComplete;
+        
+        if (isActuallyRestored) {
+          setShowRestoredMessage(true);
+          // 3초 후 메시지 숨기기
+          const timer = setTimeout(() => {
+            setShowRestoredMessage(false);
+          }, 3000);
+          return () => clearTimeout(timer);
+        }
+      }
+    } catch (error) {
+      console.warn('복원 메시지 확인 중 오류:', error);
     }
-  }, [testState.answers.length, testState.currentQuestionIndex]);
+  }, []); // 의존성 배열을 비워서 컴포넌트 마운트 시에만 실행
 
   // 결과가 생성되면 저장 후 결과 페이지로 이동
   useEffect(() => {

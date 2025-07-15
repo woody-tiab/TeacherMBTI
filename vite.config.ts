@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react()],
   base: '/TeacherMBTI/', // GitHub Pages 배포를 위한 경로 설정
   
+
+  
   // 빌드 최적화 설정
   build: {
     // 번들 크기 최적화

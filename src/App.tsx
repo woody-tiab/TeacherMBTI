@@ -71,8 +71,10 @@ const App: React.FC = () => {
   console.log('🚀 App 컴포넌트 렌더링 시작')
   
   // 개발 환경과 프로덕션 환경에 따라 basename 설정
-  const basename = window.location.hostname === 'localhost' ? '' : '/TeacherMBTI';
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const basename = isLocalhost ? '' : '/TeacherMBTI';
   console.log('📍 Router basename:', basename)
+  console.log('🌐 Current hostname:', window.location.hostname)
   
   return (
     <ErrorBoundary>
