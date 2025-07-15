@@ -193,13 +193,13 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12"
+            className="flex flex-col lg:flex-row items-center justify-center gap-3 mt-12 max-w-4xl mx-auto px-4"
           >
             <Button
               variant="primary"
               size="lg"
               onClick={onRetakeTest}
-              className="flex items-center space-x-2 min-w-[200px]"
+              className="flex items-center space-x-2 w-full lg:w-auto lg:min-w-[180px] lg:max-w-[200px]"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -214,14 +214,14 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
               onShareError={handleShareError}
               variant="secondary"
               size="lg"
-              className="min-w-[200px]"
+              className="w-full lg:w-auto lg:min-w-[180px] lg:max-w-[200px]"
             />
 
             <Button
               variant="outline"
               size="lg"
               onClick={handleSaveResult}
-              className="flex items-center space-x-2 min-w-[200px]"
+              className="flex items-center space-x-2 w-full lg:w-auto lg:min-w-[180px] lg:max-w-[200px]"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />

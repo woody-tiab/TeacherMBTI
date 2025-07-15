@@ -136,22 +136,24 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                     >
                       {/* 왼쪽 (첫 번째 성향) */}
                       <motion.div
-                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-gray-400 to-gray-500 flex items-center justify-center"
+                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-gray-400 to-gray-500"
                         initial={{ width: "50%" }}
                         animate={{ width: `${dimension.leftValue}%` }}
                         transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 + index * 0.2 }}
                         aria-label={`${dimension.leftType}: ${Math.round(dimension.leftValue)}%`}
                       >
                         {dimension.leftValue > 20 && (
-                          <span className="text-white font-medium text-sm text-center" aria-live="polite">
-                            {Math.round(dimension.leftValue)}%
-                          </span>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-white font-medium text-sm whitespace-nowrap" aria-live="polite">
+                              {Math.round(dimension.leftValue)}%
+                            </span>
+                          </div>
                         )}
                       </motion.div>
 
                       {/* 오른쪽 (두 번째 성향) */}
                       <motion.div
-                        className="absolute right-0 top-0 h-full flex items-center justify-center"
+                        className="absolute right-0 top-0 h-full"
                         style={{ 
                           background: `linear-gradient(to left, ${typeColor}, ${typeColor}88)`
                         }}
@@ -161,9 +163,11 @@ const ScoreChart = ({ result, typeColor }: ScoreChartProps) => {
                         aria-label={`${dimension.rightType}: ${Math.round(dimension.rightValue)}%`}
                       >
                         {dimension.rightValue > 20 && (
-                          <span className="text-white font-medium text-sm text-center" aria-live="polite">
-                            {Math.round(dimension.rightValue)}%
-                          </span>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-white font-medium text-sm whitespace-nowrap" aria-live="polite">
+                              {Math.round(dimension.rightValue)}%
+                            </span>
+                          </div>
                         )}
                       </motion.div>
 
