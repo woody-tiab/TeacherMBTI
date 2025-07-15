@@ -51,11 +51,7 @@ export default defineConfig({
     },
     // 포트 설정
     port: 3000,
-    open: true,
-    // SPA 라우팅을 위한 미들웨어 설정
-    proxy: {},
-    // 개발 서버에서 모든 404 요청을 index.html로 폴백
-    middlewareMode: false
+    open: true
   },
   
   // 의존성 최적화

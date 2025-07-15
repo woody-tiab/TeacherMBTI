@@ -27,32 +27,23 @@ const RefreshHandler: React.FC = () => {
   const location = useLocation();
   
   useEffect(() => {
-    // 메인페이지가 아닌 경우에만 새로고침 감지 로직 실행
+    // 메인페이지인 경우 새로고침 감지 로직을 실행하지 않음
     if (location.pathname === '/') return;
     
-    // 정상적인 네비게이션인지 확인하는 플래그들
-    const isNormalNavigation = (
-      sessionStorage.getItem('newTestStarted') === 'true' ||
-      sessionStorage.getItem('normalNavigation') === 'true'
-    );
+    // 페이지 로드 타입 확인
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const isRefresh = navigation && navigation.type === 'reload';
     
-    if (isNormalNavigation) {
-      // 플래그 정리
-      sessionStorage.removeItem('newTestStarted');
-      sessionStorage.removeItem('normalNavigation');
-      console.log('🎯 정상적인 네비게이션, 새로고침 감지 건너뛰기');
+    // 새로고침이 아닌 경우 (정상적인 네비게이션)
+    if (!isRefresh) {
+      console.log('🎯 정상적인 네비게이션 감지');
       return;
     }
     
-    // 새로고침 감지 - 가장 확실한 방법만 사용
-    const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-    const isRefresh = navigationEntries.length > 0 && navigationEntries[0].type === 'reload';
+    console.log('🔄 새로고침 감지됨, 현재 경로:', location.pathname);
     
-    if (isRefresh) {
-      console.log('🔄 새로고침 감지됨, 메인페이지로 리다이렉트');
-      
-      // 저장된 테스트 상태 확인 및 메시지 생성
-      let message = '새로고침으로 인해 메인페이지로 이동했습니다.';
+    // 테스트 페이지에서 새로고침한 경우
+    if (location.pathname === '/test') {
       const savedState = localStorage.getItem('mbti-test-state');
       
       if (savedState) {
@@ -61,23 +52,38 @@ const RefreshHandler: React.FC = () => {
           const hasProgress = parsedState.answers?.length > 0 || parsedState.currentQuestionIndex > 0;
           
           if (hasProgress) {
-            message = '새로고침으로 인해 메인페이지로 이동했습니다. 저장된 테스트 진행 상황이 있습니다.';
-            console.log('📊 진행 중인 테스트가 있습니다. 메인페이지로 이동합니다.');
+            console.log('📊 진행 중인 테스트가 있습니다. 테스트 페이지를 유지합니다.');
+            // 테스트 진행 중이면 현재 페이지 유지
+            return;
           }
         } catch (error) {
           console.warn('저장된 상태 분석 중 오류:', error);
         }
       }
-      
-      // 메시지 저장과 리다이렉트를 atomic하게 처리
-      sessionStorage.setItem('refreshMessage', JSON.stringify({
-        type: 'info',
-        message,
-        timestamp: Date.now()
-      }));
-      
-      navigate('/', { replace: true });
     }
+    
+    // 결과 페이지에서 새로고침한 경우
+    if (location.pathname === '/result') {
+      const savedResult = localStorage.getItem('mbti-test-result');
+      
+      if (savedResult) {
+        console.log('📊 저장된 결과가 있습니다. 결과 페이지를 유지합니다.');
+        // 결과가 있으면 현재 페이지 유지
+        return;
+      }
+    }
+    
+    // 그 외의 경우 메인페이지로 리다이렉트
+    console.log('🏠 메인페이지로 리다이렉트');
+    const message = '페이지를 새로고침하여 메인페이지로 이동했습니다.';
+    
+    sessionStorage.setItem('refreshMessage', JSON.stringify({
+      type: 'info',
+      message,
+      timestamp: Date.now()
+    }));
+    
+    navigate('/', { replace: true });
   }, [location.pathname, navigate]);
 
   return null;
