@@ -29,6 +29,7 @@ interface UseMBTITestReturn {
 }
 
 const TOTAL_QUESTIONS = questions.length;
+const STORAGE_KEY = 'mbti-test-state';
 
 const initialTestState: TestState = {
   currentQuestionIndex: 0,
@@ -38,8 +39,36 @@ const initialTestState: TestState = {
   isComplete: false
 };
 
+// localStorage에서 상태 불러오기
+const loadTestState = (): TestState => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsedState = JSON.parse(saved);
+      // 기본값과 병합하여 누락된 필드 보완
+      return {
+        ...initialTestState,
+        ...parsedState,
+        totalQuestions: TOTAL_QUESTIONS // 항상 최신 질문 수로 업데이트
+      };
+    }
+  } catch (error) {
+    console.warn('저장된 테스트 상태를 불러올 수 없습니다:', error);
+  }
+  return initialTestState;
+};
+
+// localStorage에 상태 저장하기
+const saveTestState = (state: TestState) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn('테스트 상태를 저장할 수 없습니다:', error);
+  }
+};
+
 export const useMBTITest = (): UseMBTITestReturn => {
-  const [testState, setTestState] = useState<TestState>(initialTestState);
+  const [testState, setTestState] = useState<TestState>(() => loadTestState());
   const [result, setResult] = useState<MBTIResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,11 +108,18 @@ export const useMBTITest = (): UseMBTITestReturn => {
     progress: currentProgress
   }), [testState, currentProgress]);
 
+  // 테스트 상태가 변경될 때마다 localStorage에 저장
+  useEffect(() => {
+    saveTestState(enhancedTestState);
+  }, [enhancedTestState]);
+
   // 테스트 시작
   const startTest = useCallback(() => {
-    setTestState(initialTestState);
+    const newState = initialTestState;
+    setTestState(newState);
     setResult(null);
     setError(null);
+    saveTestState(newState);
   }, []);
 
   // 질문 답변
@@ -154,6 +190,9 @@ export const useMBTITest = (): UseMBTITestReturn => {
         isComplete: true
       }));
 
+      // 테스트 완료 후 저장된 상태 제거
+      localStorage.removeItem(STORAGE_KEY);
+
     } catch (err) {
       setError(err instanceof Error ? err.message : '결과 계산 중 오류가 발생했습니다.');
     } finally {
@@ -163,10 +202,12 @@ export const useMBTITest = (): UseMBTITestReturn => {
 
   // 테스트 초기화
   const resetTest = useCallback(() => {
-    setTestState(initialTestState);
+    const newState = initialTestState;
+    setTestState(newState);
     setResult(null);
     setError(null);
     setIsLoading(false);
+    localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   // 테스트 완료 시 자동으로 결과 계산
