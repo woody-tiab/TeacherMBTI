@@ -7,6 +7,21 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 
+---
+
+## 🆕 최근 업데이트 내역
+
+- **PC 화면에서 차트(ScoreChart) 100% 정렬 문제 완벽 해결**
+- **결과 페이지 버튼 레이아웃 개선**  
+  - "다시 테스트하기" 단독, "결과 공유/저장" 나란히 2줄 배치
+- **"다시 테스트하기" 버튼 클릭 시 테스트 완전 초기화**
+- **404/흰 화면 등 오류 발생 시 사용자 경험 개선**
+- **UI/UX 세부 개선**  
+  - 모든 화면에서 일관된 중앙 정렬, 반응형 레이아웃 강화
+- **코드 리팩토링 및 성능 최적화**
+
+---
+
 ## 🎯 프로젝트 개요
 
 교사 MBTI 분석 웹앱은 교육자들이 자신의 수업 스타일을 이해하고 개선할 수 있도록 도와주는 도구입니다. 24개의 실제 교육 상황 기반 질문을 통해 16가지 MBTI 타입 중 하나로 분류하고, 각 타입별 맞춤형 교육 방법론을 제시합니다.
