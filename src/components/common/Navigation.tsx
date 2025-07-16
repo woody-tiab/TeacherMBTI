@@ -42,7 +42,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', currentPage, on
               🎯
             </motion.div>
             <span className="text-xl font-bold text-gray-800 hidden sm:block">
-              교사 MBTI
+              TeacherMBTI
             </span>
           </button>
 
