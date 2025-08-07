@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* 한글 텍스트를 위한 기본 설정 */
+  html {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  
+  body {
+    line-height: 1.6;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  /* 한글 텍스트를 위한 커스텀 유틸리티 */
+  .text-korean {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  
+  .break-korean {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+} 
