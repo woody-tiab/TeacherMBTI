@@ -25,9 +25,6 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]'
       },
-      input: {
-        main: 'index.html'
-      }
     },
     // 파일 압축 설정
     minify: 'terser',
