@@ -11,7 +11,6 @@ import ResultCard from '../components/result/ResultCard';
 import TypeDescription from '../components/result/TypeDescription';
 import TeachingStyleInfo from '../components/result/TeachingStyleInfo';
 import ScoreChart from '../components/result/ScoreChart';
-import CompleteResults from '../components/result/CompleteResults';
 
 type SectionType = 'overview' | 'details' | 'style' | 'chart';
 
@@ -53,6 +52,7 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   };
   const [typeInfo, setTypeInfo] = useState<MBTITypeInfo | null>(null);
   const [currentSection, setCurrentSection] = useState<SectionType>('overview');
+  const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<ToastState>({
     isVisible: false,
     message: '',
@@ -62,8 +62,17 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   useEffect(() => {
     if (result) {
       setTypeInfo(getMBTITypeInfo(result.type));
+      setIsLoading(false);
+    } else {
+      // 결과가 없으면 3초 후 자동으로 테스트 페이지로 이동
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        onNavigateToTest();
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
-  }, [result]);
+  }, [result, onNavigateToTest]);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({
@@ -88,13 +97,20 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   };
 
 
-  if (!result || !typeInfo) {
+  if (isLoading || !result || !typeInfo) {
     return (
       <Layout showHeader={false}>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-gray-600">결과를 불러오는 중...</p>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+          <div className="text-center space-y-6 p-8 bg-white rounded-2xl shadow-lg">
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
+            <div>
+              <p className="text-gray-800 font-medium text-lg mb-2">
+                {result ? "결과를 불러오는 중..." : "테스트 결과를 찾을 수 없습니다"}
+              </p>
+              <p className="text-gray-600 text-sm">
+                {result ? "잠시만 기다려 주세요" : "테스트 페이지로 이동합니다..."}
+              </p>
+            </div>
           </div>
         </div>
       </Layout>

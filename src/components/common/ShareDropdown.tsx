@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SHARE_TEXT } from '../../constants/shareText';
 import { QuickActions } from './QuickActions';
-import { SocialShareButtons } from './SocialShareButtons';
 import { MBTIResult, MBTITypeInfo } from '../../types/mbti';
 
 interface ShareDropdownProps {
