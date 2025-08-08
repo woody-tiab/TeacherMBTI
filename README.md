@@ -84,9 +84,12 @@
 
 </div>
 
-### 📦 주요 라이브러리
-- **React Router Dom 6.30.0** - SPA 라우팅 및 네비게이션
-- **Custom Hooks** - 상태 관리 및 비즈니스 로직 분리
+### 📦 핵심 라이브러리 및 기술
+- **State-based Navigation** - React Router 없는 경량 네비게이션 시스템
+- **React.lazy** - 페이지별 코드 스플리팅으로 성능 최적화
+- **Custom Hooks** - 상태 관리 및 비즈니스 로직 분리 (useMBTITest)
+- **Secure Storage** - 암호화된 로컬 저장소로 데이터 보안 강화
+- **Error Boundary** - 런타임 오류 처리 및 안정성 보장
 - **TypeScript Strict Mode** - 엄격한 타입 안전성
 - **Terser** - JavaScript 코드 최적화 및 압축
 
@@ -115,10 +118,10 @@ npm install
 <summary><b>💻 2단계: 개발 서버 실행</b></summary>
 
 ```bash
-# 개발 서버 실행 (http://localhost:5173)
+# 개발 서버 실행 (http://localhost:3000)
 npm run dev
 ```
-브라우저에서 `http://localhost:5173`으로 접속하여 개발 환경 확인
+브라우저에서 `http://localhost:3000`으로 접속하여 개발 환경 확인
 </details>
 
 <details>
@@ -167,12 +170,15 @@ TeacherMBTI/
 │   │   ├── 📁 common/            # 공통 컴포넌트
 │   │   │   ├── Button.tsx        # 재사용 버튼 컴포넌트
 │   │   │   ├── Card.tsx          # 카드 레이아웃
+│   │   │   ├── ErrorBoundary.tsx # 에러 경계 컴포넌트
+│   │   │   ├── Layout.tsx        # 페이지 레이아웃
 │   │   │   ├── Loading.tsx       # 로딩 스피너
 │   │   │   ├── Navigation.tsx    # 상단 네비게이션
 │   │   │   ├── ProgressBar.tsx   # 진행률 표시
 │   │   │   ├── QuickActions.tsx  # 빠른 액션 버튼
 │   │   │   ├── ShareButton.tsx   # 공유 버튼
 │   │   │   ├── ShareDropdown.tsx # 공유 드롭다운
+│   │   │   ├── SocialShareButtons.tsx # SNS 공유 버튼
 │   │   │   └── Toast.tsx         # 알림 토스트
 │   │   ├── 📁 question/          # 질문 관련 컴포넌트
 │   │   │   ├── AnswerButton.tsx  # 답변 선택 버튼
@@ -185,9 +191,9 @@ TeacherMBTI/
 │   │       ├── TeachingStyleInfo.tsx  # 교수 스타일 정보
 │   │       └── TypeDescription.tsx    # 타입 설명
 │   ├── 📁 pages/                 # 📄 페이지 컴포넌트
-│   │   ├── HomePage.tsx          # 🏠 메인 페이지
-│   │   ├── TestPage.tsx          # 📝 테스트 페이지
-│   │   └── ResultPage.tsx        # 📊 결과 페이지
+│   │   ├── HomePage.tsx          # 🏠 메인 페이지 (테스트 시작/재개)
+│   │   ├── TestPage.tsx          # 📝 테스트 페이지 (24개 질문)
+│   │   └── ResultPage.tsx        # 📊 결과 페이지 (MBTI 분석)
 │   ├── 📁 types/                 # 🏷️ TypeScript 타입 정의
 │   │   └── mbti.ts               # MBTI 관련 타입
 │   ├── 📁 data/                  # 📚 정적 데이터
@@ -233,10 +239,10 @@ TeacherMBTI/
 <td width="50%">
 
 #### 🔄 **상태 관리 패턴**
-- **useMBTITest Hook** - 중앙화된 테스트 상태
-- **React Context** - 전역 상태 관리
-- **Local State** - 컴포넌트별 UI 상태
-- **URL State** - 결과 공유를 위한 URL 파라미터
+- **useMBTITest Hook** - 중앙화된 테스트 상태 관리
+- **State-based Routing** - URL 대신 컴포넌트 상태로 페이지 전환
+- **Secure Local Storage** - 테스트 진행 상황 안전 저장
+- **Local Component State** - 컴포넌트별 UI 상태
 
 </td>
 </tr>
@@ -429,19 +435,19 @@ hotfix/urgent ───────●──    (긴급 수정)
 <td width="50%">
 
 ### 🎯 **v1.1.0** *(개발 예정)*
-- [ ] 🔄 **PWA 지원 완료** - 오프라인 사용 가능
-- [ ] 💾 **결과 저장 기능** - 로컬 저장소 활용
-- [ ] 📊 **통계 대시보드** - 사용 패턴 분석
-- [ ] 🔔 **알림 시스템** - 푸시 알림 지원
+- [ ] 🔄 **React Router 도입** - URL 기반 라우팅 시스템
+- [ ] 📱 **PWA 지원** - 오프라인 사용 및 앱 설치
+- [ ] 📊 **통계 대시보드** - 개인 테스트 이력 관리
+- [ ] 🎨 **결과 커스터마이징** - 개인화된 분석 리포트
 
 </td>
 <td width="50%">
 
 ### 🌟 **v1.2.0** *(장기 계획)*
 - [ ] 🌍 **다국어 지원** - 영어, 일본어 추가
-- [ ] 🌙 **다크 모드** - 테마 변경 기능
-- [ ] 📋 **상세 분석 리포트** - PDF 다운로드
-- [ ] 👥 **팀 분석 기능** - 그룹 결과 비교
+- [ ] 🌙 **다크 모드** - 라이트/다크 테마 토글
+- [ ] 📋 **상세 분석 리포트** - PDF/이미지 다운로드
+- [ ] 🎯 **맞춤형 질문** - 교사 경력별 질문 세트
 
 </td>
 </tr>
