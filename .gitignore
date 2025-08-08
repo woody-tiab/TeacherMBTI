@@ -87,7 +87,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public - Vite에서는 public 폴더가 필요함
 
 # Storybook build outputs
 .out

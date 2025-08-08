@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>교사 MBTI 수업 스타일 분석</title>
+    
+    <!-- GitHub Pages SPA 라우팅 지원 -->
+    <script>
+        // Single Page Apps for GitHub Pages
+        // https://github.com/rafrex/spa-github-pages
+        
+        var pathSegmentsToKeep = 1; // TeacherMBTI 경로 유지
+        
+        var l = window.location;
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?p=' +
+            l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash
+        );
+    </script>
+</head>
+<body>
+    <!-- GitHub Pages에서 React Router를 위한 404 처리 -->
+</body>
+</html>
