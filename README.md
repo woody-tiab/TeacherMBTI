@@ -50,11 +50,11 @@
 - **접근성 완전 준수** - WCAG 2.1 AA 표준
 - **직관적 인터페이스** - 누구나 쉬운 사용법
 
-### 🔗 **풍부한 공유 옵션**
-- **원클릭 SNS 공유** - 카카오톡, LINE, Facebook, Twitter
-- **결과 이미지 저장** - html2canvas 기반 고품질
-- **URL 링크 공유** - Web Share API 지원
-- **다운로드 기능** - PNG 형태 결과 저장
+### 🔗 **공유 및 저장 기능**
+- **결과 이미지 저장** - html2canvas 기반 고품질 이미지 생성
+- **Web Share API** - 모바일 네이티브 공유 지원
+- **URL 복사** - 클립보드를 통한 간편 공유
+- **PNG 다운로드** - 로컬 저장 지원
 
 </td>
 </tr>
@@ -178,7 +178,6 @@ TeacherMBTI/
 │   │   │   ├── QuickActions.tsx  # 빠른 액션 버튼
 │   │   │   ├── ShareButton.tsx   # 공유 버튼
 │   │   │   ├── ShareDropdown.tsx # 공유 드롭다운
-│   │   │   ├── SocialShareButtons.tsx # SNS 공유 버튼
 │   │   │   └── Toast.tsx         # 알림 토스트
 │   │   ├── 📁 question/          # 질문 관련 컴포넌트
 │   │   │   ├── AnswerButton.tsx  # 답변 선택 버튼
@@ -363,11 +362,11 @@ hotfix/urgent ───────●──    (긴급 수정)
 - [ ] 진행률 바 실시간 업데이트 확인
 - [ ] 결과 페이지 정확한 MBTI 타입 표시
 
-#### 🔗 **공유 기능**
+#### 🔗 **공유 및 저장 기능**
 - [ ] URL 복사 기능 동작 확인
-- [ ] SNS 공유 버튼 (카카오톡, LINE, Facebook, Twitter) 동작
 - [ ] 결과 이미지 생성 및 다운로드 기능
-- [ ] Web Share API 지원 여부
+- [ ] PNG 이미지 저장 기능 확인
+- [ ] Web Share API 지원 여부 (모바일)
 
 #### 📱 **반응형 & 접근성**
 - [ ] 모바일 (320px~767px) 레이아웃 확인
