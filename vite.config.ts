@@ -16,7 +16,6 @@ export default defineConfig({
         // 코드 스플리팅: vendor와 app 코드 분리
         manualChunks: {
           'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['react-router-dom'],
           'vendor-animation': ['framer-motion'],
           'vendor-utils': ['html2canvas']
         },
@@ -56,7 +55,6 @@ export default defineConfig({
     include: [
       'react',
       'react-dom',
-      'react-router-dom',
       'framer-motion'
     ]
   },

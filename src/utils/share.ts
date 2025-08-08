@@ -92,25 +92,6 @@ const fallbackCopyToClipboard = (text: string): boolean => {
   }
 };
 
-// SNS 직접 공유 링크 생성
-export const getSocialLinks = (shareData: ShareData) => {
-  const encodedText = encodeURIComponent(shareData.text);
-  const encodedUrl = encodeURIComponent(shareData.url);
-  const encodedTitle = encodeURIComponent(shareData.title);
-
-  return {
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`,
-    twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
-    kakao: `https://story.kakao.com/share?url=${encodedUrl}&text=${encodedText}`,
-    line: `https://social-plugins.line.me/lineit/share?url=${encodedUrl}&text=${encodedText}`,
-    telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
-    whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&title=${encodedTitle}&summary=${encodedText}`,
-    pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}`,
-    reddit: `https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`,
-    email: `mailto:?subject=${encodedTitle}&body=${encodedText}%0A%0A${encodedUrl}`
-  };
-};
 
 export interface ImageCaptureOptions {
   backgroundColor?: string;

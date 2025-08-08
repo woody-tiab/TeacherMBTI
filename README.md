@@ -51,10 +51,10 @@
 - **직관적 인터페이스** - 누구나 쉬운 사용법
 
 ### 🔗 **공유 및 저장 기능**
-- **결과 이미지 저장** - html2canvas 기반 고품질 이미지 생성
+- **결과 이미지 저장** - html2canvas 기반 고품질 PNG 이미지 생성
 - **Web Share API** - 모바일 네이티브 공유 지원
-- **URL 복사** - 클립보드를 통한 간편 공유
-- **PNG 다운로드** - 로컬 저장 지원
+- **클립보드 복사** - 텍스트 및 URL 간편 복사
+- **이미지 다운로드** - 전체 결과를 PNG 파일로 저장
 
 </td>
 </tr>
@@ -85,13 +85,15 @@
 </div>
 
 ### 📦 핵심 라이브러리 및 기술
-- **State-based Navigation** - React Router 없는 경량 네비게이션 시스템
+- **State-based Navigation** - React Router 대신 useState 기반 경량 네비게이션 시스템
 - **React.lazy** - 페이지별 코드 스플리팅으로 성능 최적화
 - **Custom Hooks** - 상태 관리 및 비즈니스 로직 분리 (useMBTITest)
 - **Secure Storage** - 암호화된 로컬 저장소로 데이터 보안 강화
 - **Error Boundary** - 런타임 오류 처리 및 안정성 보장
 - **TypeScript Strict Mode** - 엄격한 타입 안전성
 - **Terser** - JavaScript 코드 최적화 및 압축
+- **html2canvas** - 결과 화면의 고품질 이미지 생성
+- **Web Share API** - 모바일 네이티브 공유 인터페이스
 
 ## 🛠 개발 환경 설정
 
@@ -163,8 +165,8 @@ npm run deploy
 TeacherMBTI/
 ├── 📁 public/                    # 정적 파일
 │   ├── vite.svg                  # Vite 로고
-│   ├── 404.html                  # SPA 라우팅 지원
-│   └── index.html                # HTML 템플릿
+│   ├── favicon.ico               # 파비콘
+│   └── 404.html                  # SPA 라우팅 지원
 ├── 📁 src/
 │   ├── 📁 components/            # 🧩 React 컴포넌트
 │   │   ├── 📁 common/            # 공통 컴포넌트
@@ -206,7 +208,6 @@ TeacherMBTI/
 │   │   └── useMBTITest.ts        # MBTI 테스트 상태 관리
 │   ├── 📁 constants/             # 🔒 상수 정의
 │   │   ├── shareText.ts          # 공유 텍스트
-│   │   ├── socialPlatforms.tsx   # 소셜 플랫폼
 │   │   └── styles.ts             # 스타일 상수
 │   ├── App.tsx                   # 🚀 메인 앱 컴포넌트
 │   ├── main.tsx                  # 📍 엔트리 포인트
@@ -290,7 +291,10 @@ npm run deploy
 
 #### 📊 **성능 목표 지표**
 - **Lighthouse Score**: 95+ 목표
-- **Bundle Size**: < 500KB (gzipped)
+- **Bundle Size**: ~430KB (최적화됨)
+  - vendor-react: ~139KB (React 핵심)
+  - vendor-utils: ~200KB (html2canvas)
+  - vendor-animation: ~115KB (Framer Motion)
 - **FCP**: < 1.5초
 - **LCP**: < 2.5초
 - **CLS**: < 0.1
@@ -363,10 +367,10 @@ hotfix/urgent ───────●──    (긴급 수정)
 - [ ] 결과 페이지 정확한 MBTI 타입 표시
 
 #### 🔗 **공유 및 저장 기능**
-- [ ] URL 복사 기능 동작 확인
-- [ ] 결과 이미지 생성 및 다운로드 기능
-- [ ] PNG 이미지 저장 기능 확인
-- [ ] Web Share API 지원 여부 (모바일)
+- [ ] 클립보드 복사 기능 동작 확인 (텍스트 및 URL)
+- [ ] 결과 이미지 생성 및 PNG 다운로드 기능
+- [ ] Web Share API 지원 여부 (모바일 네이티브 공유)
+- [ ] 이미지 품질 및 브랜딩 확인
 
 #### 📱 **반응형 & 접근성**
 - [ ] 모바일 (320px~767px) 레이아웃 확인
@@ -434,10 +438,10 @@ hotfix/urgent ───────●──    (긴급 수정)
 <td width="50%">
 
 ### 🎯 **v1.1.0** *(개발 예정)*
-- [ ] 🔄 **React Router 도입** - URL 기반 라우팅 시스템
 - [ ] 📱 **PWA 지원** - 오프라인 사용 및 앱 설치
 - [ ] 📊 **통계 대시보드** - 개인 테스트 이력 관리
 - [ ] 🎨 **결과 커스터마이징** - 개인화된 분석 리포트
+- [ ] 🔄 **테스트 재시작** - 부분 재응답 및 수정 기능
 
 </td>
 <td width="50%">

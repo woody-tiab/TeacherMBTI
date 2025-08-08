@@ -8,5 +8,4 @@ export { default as Navigation } from './Navigation';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as Loading } from './Loading';
 export { ShareDropdown } from './ShareDropdown';
-export { QuickActions } from './QuickActions';
-export { SocialShareButtons } from './SocialShareButtons'; 
+export { QuickActions } from './QuickActions'; 
