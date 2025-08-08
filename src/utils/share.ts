@@ -159,24 +159,53 @@ export const generateShareImage = async (
     // 이미지 캡처 전 스타일 최적화
     originalStyles = prepareElementForCapture(element);
 
-    // html2canvas 옵션 - 더 안정적이고 고품질로 설정
+    // DOM 레이아웃 계산 완료 대기 (더 긴 시간)
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // 전체 콘텐츠 크기 계산 (여유 공간 포함)
+    // 여러 번 측정하여 안정적인 크기 확보
+    let fullWidth = 0;
+    let fullHeight = 0;
+    
+    for (let i = 0; i < 3; i++) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+      const currentWidth = Math.max(
+        element.offsetWidth,
+        element.scrollWidth,
+        element.getBoundingClientRect().width
+      );
+      const currentHeight = Math.max(
+        element.offsetHeight,
+        element.scrollHeight,
+        element.getBoundingClientRect().height
+      );
+      
+      fullWidth = Math.max(fullWidth, currentWidth);
+      fullHeight = Math.max(fullHeight, currentHeight);
+    }
+    
+    // 안전한 여유 공간 추가 (텍스트 잘림 방지)
+    fullHeight += 500;
+
+    // html2canvas 옵션 - 전체 콘텐츠 캡처를 위한 최적 설정
     const html2canvasOptions = {
       backgroundColor,
       scale: Math.min(scale, 2), // 고해상도 유지
       logging: false,
       useCORS: true,
       allowTaint: true,
-      width: element.offsetWidth,
-      height: element.offsetHeight,
+      width: fullWidth, // 전체 너비 사용
+      height: fullHeight, // 전체 높이 + 여유 공간 사용
       scrollX: 0,
       scrollY: 0,
-      windowWidth: element.offsetWidth,
-      windowHeight: element.offsetHeight,
+      windowWidth: Math.max(element.scrollWidth, fullWidth, 1000), // 최소 1000px 보장
+      windowHeight: Math.max(element.scrollHeight, fullHeight, 2500), // 최소 2500px 보장
       x: 0,
       y: 0,
-      removeContainer: true,
+      removeContainer: false, // 컨테이너 제거하지 않음
       foreignObjectRendering: false,
-      imageTimeout: 15000,
+      imageTimeout: 30000, // 타임아웃 더 늘림 (30초)
+      canvas: null, // 캔버스 재사용 방지
       // 더 정교한 요소 필터링
       ignoreElements: (element: Element) => {
         const htmlEl = element as HTMLElement;
@@ -227,8 +256,12 @@ export const generateShareImage = async (
         logging: false,
         useCORS: false,
         allowTaint: true,
-        width: element.offsetWidth,
-        height: element.offsetHeight,
+        width: fullWidth, // 전체 너비 사용
+        height: fullHeight, // 전체 높이 + 여유 공간 사용
+        windowWidth: Math.max(element.scrollWidth, fullWidth, 1000), // 최소 1000px 보장
+        windowHeight: Math.max(element.scrollHeight, fullHeight, 2500), // 최소 2500px 보장
+        removeContainer: false, // 컨테이너 제거하지 않음
+        imageTimeout: 30000, // 타임아웃 더 늘림 (30초)
         foreignObjectRendering: false,
         ignoreElements: (el: Element) => {
           const htmlEl = el as HTMLElement;
@@ -340,9 +373,25 @@ const prepareElementForCapture = (element: HTMLElement) => {
   
   // 고정 너비 설정으로 레이아웃 안정화
   if (element.getAttribute('data-share-image') === 'complete-results' || element.getAttribute('data-share-image') === 'temp-complete-results') {
-    element.style.width = '800px';
-    element.style.padding = '32px 32px 32px 32px'; // 균등한 좌우 패딩
+    element.style.width = '1000px';
+    element.style.padding = '40px 40px 40px 40px'; // 균등한 패딩
+    element.style.minHeight = '2200px'; // 최소 높이 보장
   }
+
+  // 전체 콘텐츠가 표시되도록 높이 제한 해제
+  element.style.maxHeight = 'none';
+  element.style.overflow = 'visible';
+  
+  // 자식 요소들의 overflow도 visible로 설정
+  const childElements = element.querySelectorAll('*') as NodeListOf<HTMLElement>;
+  childElements.forEach(child => {
+    if (child.style.maxHeight) {
+      child.style.maxHeight = 'none';
+    }
+    if (child.style.overflow === 'hidden' || child.style.overflow === 'scroll' || child.style.overflow === 'auto') {
+      child.style.overflow = 'visible';
+    }
+  });
 
   // 문제가 되는 그라디언트 요소들을 안전한 색상으로 변경
   fixGradientElements(element);
@@ -430,6 +479,17 @@ const restoreElementStyles = (element: HTMLElement, originalStyles: {
   element.style.width = originalStyles.width;
   element.style.margin = originalStyles.margin;
   element.style.padding = originalStyles.padding;
+
+  // 추가된 스타일 복원
+  element.style.maxHeight = '';
+  element.style.overflow = '';
+
+  // 자식 요소들의 스타일도 복원
+  const childElements = element.querySelectorAll('*') as NodeListOf<HTMLElement>;
+  childElements.forEach(child => {
+    child.style.maxHeight = '';
+    child.style.overflow = '';
+  });
 
   // print 스타일 복원
   const printElements = element.querySelectorAll('.hidden.print\\:block');

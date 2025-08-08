@@ -97,7 +97,6 @@ export const QuickActions = ({
             existingContainer.parentNode?.removeChild(existingContainer);
           }
           
-          console.log('Temporary container cleaned up successfully');
         } catch (cleanupError) {
           console.warn('Failed to cleanup temp container:', cleanupError);
         }
@@ -125,39 +124,51 @@ export const QuickActions = ({
         top: 50px;
         left: 50px;
         width: 1000px;
-        min-height: 800px;
-        background: linear-gradient(to bottom right, #eff6ff, #ffffff, #faf5ff);
-        padding: 32px;
+        height: auto;
+        min-height: 2200px;
+        max-height: none;
+        background: #ffffff;
+        padding: 40px;
         z-index: 9999;
         visibility: visible;
         opacity: 1;
         border-radius: 16px;
         font-family: ${FONT_STACK};
         box-sizing: border-box;
-        overflow: hidden;
-        line-height: 1.6;
+        overflow: visible;
+        line-height: 1.7;
         color: #111827;
+        word-break: keep-all;
+        white-space: normal;
       `;
       
       // body에 추가
       document.body.appendChild(tempContainer);
       
+      // 렌더링 대기 및 크기 재조정을 위한 초기 대기
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // 헤더 추가
       const header = document.createElement('div');
       header.style.cssText = 'text-align: center; margin-bottom: 32px;';
-      header.innerHTML = `
-        <h1 style="font-family: ${FONT_STACK}; font-size: 2rem; font-weight: bold; color: #111827; margin-bottom: 16px;">
-          교사 MBTI 분석 결과
-        </h1>
-        <p style="font-family: ${FONT_STACK}; color: #6b7280; max-width: 500px; margin: 0 auto;">
-          당신의 교육 스타일과 성격 특성을 종합적으로 분석한 결과입니다
-        </p>
-      `;
+      
+      // h1 요소 생성
+      const h1 = document.createElement('h1');
+      h1.style.cssText = `font-family: ${FONT_STACK}; font-size: 2rem; font-weight: bold; color: #111827; margin-bottom: 16px;`;
+      h1.textContent = '교사 MBTI 분석 결과';
+      
+      // p 요소 생성
+      const p = document.createElement('p');
+      p.style.cssText = `font-family: ${FONT_STACK}; color: #6b7280; max-width: 500px; margin: 0 auto;`;
+      p.textContent = '당신의 교육 스타일과 성격 특성을 종합적으로 분석한 결과입니다';
+      
+      header.appendChild(h1);
+      header.appendChild(p);
       tempContainer.appendChild(header);
       
       // 4개 섹션 컨테이너
       const sectionsContainer = document.createElement('div');
-      sectionsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 24px;';
+      sectionsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 32px;';
       
       // 각 섹션 생성
       const sections = [
@@ -169,13 +180,19 @@ export const QuickActions = ({
       
       sections.forEach(section => {
         const sectionDiv = document.createElement('div');
-        sectionDiv.style.cssText = 'margin-bottom: 24px;';
-        sectionDiv.innerHTML = `
-          <h2 style="font-size: 1.25rem; font-weight: 600; color: #111827; margin-bottom: 16px;">
-            ${section.title}
-          </h2>
-          ${section.content}
-        `;
+        sectionDiv.style.cssText = 'margin-bottom: 32px;';
+        
+        // h2 요소 생성
+        const h2 = document.createElement('h2');
+        h2.style.cssText = 'font-size: 1.25rem; font-weight: 600; color: #111827; margin-bottom: 16px;';
+        h2.textContent = section.title;
+        
+        // 콘텐츠 컨테이너 생성
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = section.content; // section.content는 내부에서 이미 검증된 안전한 HTML
+        
+        sectionDiv.appendChild(h2);
+        sectionDiv.appendChild(contentDiv);
         sectionsContainer.appendChild(sectionDiv);
       });
       
@@ -184,17 +201,45 @@ export const QuickActions = ({
       // 브랜딩 추가
       const branding = document.createElement('div');
       branding.style.cssText = 'margin-top: 32px; text-align: center;';
-      branding.innerHTML = `
-        <div style="background: rgba(255,255,255,0.8); border-radius: 8px; padding: 16px; border: 1px solid #e5e7eb;">
-          <p style="font-family: ${FONT_STACK}; font-size: 0.875rem; color: #6b7280;">
-            🎯 교사 MBTI 수업 스타일 분석 | 나만의 교육 스타일을 확인해보세요
-          </p>
-        </div>
-      `;
+      
+      const brandingCard = document.createElement('div');
+      brandingCard.style.cssText = 'background: rgba(255,255,255,0.8); border-radius: 8px; padding: 16px; border: 1px solid #e5e7eb;';
+      
+      const brandingText = document.createElement('p');
+      brandingText.style.cssText = `font-family: ${FONT_STACK}; font-size: 0.875rem; color: #6b7280;`;
+      brandingText.textContent = '🎯 교사 MBTI 수업 스타일 분석 | 나만의 교육 스타일을 확인해보세요';
+      
+      brandingCard.appendChild(brandingText);
+      branding.appendChild(brandingCard);
       tempContainer.appendChild(branding);
       
-      // 렌더링 완료 기다리기
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // 렌더링 완료 기다리기 (더 긴 시간으로 수정)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // 실제 렌더링된 크기 확인하고 컨테이너 크기 동적 조정
+      // 여러 번 측정하여 가장 큰 값 사용
+      let maxHeight = 0;
+      for (let i = 0; i < 3; i++) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const currentHeight = Math.max(
+          tempContainer.offsetHeight,
+          tempContainer.scrollHeight,
+          tempContainer.getBoundingClientRect().height,
+          [...tempContainer.children].reduce((acc, child) => {
+            const childRect = (child as HTMLElement).getBoundingClientRect();
+            return acc + childRect.height;
+          }, 0) + 80 // 패딩 고려
+        );
+        maxHeight = Math.max(maxHeight, currentHeight);
+      }
+      
+      // 추가 여유 공간을 위해 실제 높이보다 400px 더 크게 설정 (텍스트 잘림 방지)
+      const finalHeight = maxHeight + 400;
+      tempContainer.style.minHeight = `${finalHeight}px`;
+      tempContainer.style.height = `${finalHeight}px`;
+      
+      // 크기 조정 후 추가 렌더링 대기
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       return tempContainer;
     } catch (error) {
@@ -633,32 +678,74 @@ export const QuickActions = ({
         </div>
         
         <!-- 전체 요약 -->
-        <div style="margin-top: 32px;">
-          <div style="background: linear-gradient(to bottom right, #eff6ff, #faf5ff); border-radius: 12px; padding: 24px; text-align: center; border: 1px solid #e5e7eb;">
+        <div style="margin-top: 50px; margin-bottom: 80px; page-break-inside: avoid; width: 100%;">
+          <div style="
+            background: #f8fafc; 
+            border-radius: 16px; 
+            padding: 50px 40px 60px 40px; 
+            text-align: center; 
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-height: 300px;
+            width: 100%;
+            box-sizing: border-box;
+          ">
             <div style="
-              width: 64px;
-              height: 64px;
-              margin: 0 auto 16px auto;
+              width: 80px;
+              height: 80px;
+              margin: 0 auto 30px auto;
               border-radius: 50%;
               background: ${typeInfo.color};
               display: flex;
               align-items: center;
               justify-content: center;
               color: white;
-              font-size: 1.25rem;
+              font-size: 1.5rem;
               font-weight: bold;
-              box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.15);
+              box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.2);
             ">
               ${result.type}
             </div>
             
-            <h3 style="font-size: 1.25rem; font-weight: bold; color: #111827; margin-bottom: 16px;">종합 분석 결과</h3>
+            <h3 style="
+              font-size: 1.75rem; 
+              font-weight: bold; 
+              color: #111827; 
+              margin-bottom: 30px;
+              font-family: ${FONT_STACK};
+              line-height: 1.2;
+            ">종합 분석 결과</h3>
             
-            <p style="color: #6b7280; max-width: 500px; margin: 0 auto; line-height: 1.6;">
-              당신의 MBTI 성격 유형은 <strong>${result.type}</strong>이며, 
-              결과의 신뢰도는 <strong>${result.confidence}%</strong>입니다. 
-              각 차원의 성향이 균형 있게 나타나거나 한쪽으로 치우쳐 있는지 확인해보세요.
-            </p>
+            <div style="
+              color: #374151; 
+              max-width: 700px; 
+              margin: 0 auto; 
+              line-height: 2.2; 
+              font-size: 1.1rem; 
+              word-break: keep-all; 
+              white-space: normal;
+              font-family: ${FONT_STACK};
+              padding: 24px;
+              background: rgba(255, 255, 255, 0.9);
+              border-radius: 12px;
+              border: 1px solid rgba(0, 0, 0, 0.1);
+              box-sizing: border-box;
+              width: 100%;
+            ">
+              <div style="margin-bottom: 20px; padding-bottom: 20px;">
+                <p style="margin: 0; padding: 0; font-size: 1.1rem; line-height: 2.2;">
+                  당신의 MBTI 성격 유형은 
+                  <strong style="color: ${typeInfo.color}; font-weight: 700; font-size: 1.25rem;">${result.type}</strong>이며, 
+                  결과의 신뢰도는 
+                  <strong style="color: ${typeInfo.color}; font-weight: 700; font-size: 1.25rem;">${result.confidence}%</strong>입니다.
+                </p>
+              </div>
+              <div style="padding-top: 20px;">
+                <p style="margin: 0; padding: 0; font-size: 1.1rem; line-height: 2.2;">
+                  각 차원의 성향이 균형 있게 나타나거나 한쪽으로 치우쳐 있는지 확인해보세요.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
