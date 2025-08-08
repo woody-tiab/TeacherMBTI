@@ -11,6 +11,7 @@ import ResultCard from '../components/result/ResultCard';
 import TypeDescription from '../components/result/TypeDescription';
 import TeachingStyleInfo from '../components/result/TeachingStyleInfo';
 import ScoreChart from '../components/result/ScoreChart';
+import { secureJsonStorage } from '../utils/secureStorage';
 
 type SectionType = 'overview' | 'details' | 'style' | 'chart';
 
@@ -30,11 +31,10 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   // useMBTITest 훅을 사용하여 resetTest 함수 가져오기
   const { resetTest } = useMBTITest();
   
-  // URL 파라미터에서 결과 정보를 가져오거나 localStorage에서 가져옵니다
+  // URL 파라미터에서 결과 정보를 가져오거나 보안 스토리지에서 가져옵니다
   const getResultFromStorage = (): MBTIResult | null => {
     try {
-      const stored = localStorage.getItem('mbtiTestResult');
-      return stored ? JSON.parse(stored) : null;
+      return secureJsonStorage.getItem<MBTIResult>('mbtiTestResult');
     } catch {
       return null;
     }
@@ -45,8 +45,8 @@ const ResultPage: React.FC<ResultPageProps> = ({ onNavigateToHome: _unused, onNa
   const onRetakeTest = () => {
     // 테스트를 완전히 초기화
     resetTest();
-    // 결과 localStorage도 제거
-    localStorage.removeItem('mbtiTestResult');
+    // 결과 보안 스토리지에서도 제거
+    secureJsonStorage.removeItem('mbtiTestResult');
     // 테스트 페이지로 이동
     onNavigateToTest();
   };

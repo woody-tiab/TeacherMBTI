@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { TestState, MBTIAnswer, MBTIResult, MBTIQuestion } from '../types/mbti';
 import { updateTestState, calculateMBTI, validateAnswers, calculateProgress } from '../utils/mbti';
 import { questions } from '../data/questions';
+import { secureJsonStorage } from '../utils/secureStorage';
 
 interface UseMBTITestReturn {
   // 상태
@@ -39,16 +40,15 @@ const initialTestState: TestState = {
   isComplete: false
 };
 
-// localStorage에서 상태 불러오기
+// 보안 스토리지에서 상태 불러오기
 const loadTestState = (): TestState => {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsedState = JSON.parse(saved);
+    const savedState = secureJsonStorage.getItem<TestState>(STORAGE_KEY);
+    if (savedState) {
       // 기본값과 병합하여 누락된 필드 보완
       return {
         ...initialTestState,
-        ...parsedState,
+        ...savedState,
         totalQuestions: TOTAL_QUESTIONS // 항상 최신 질문 수로 업데이트
       };
     }
@@ -58,10 +58,13 @@ const loadTestState = (): TestState => {
   return initialTestState;
 };
 
-// localStorage에 상태 저장하기
+// 보안 스토리지에 상태 저장하기
 const saveTestState = (state: TestState) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const success = secureJsonStorage.setItem(STORAGE_KEY, state);
+    if (!success) {
+      console.warn('테스트 상태 보안 저장에 실패했습니다');
+    }
   } catch (error) {
     console.warn('테스트 상태를 저장할 수 없습니다:', error);
   }
@@ -208,7 +211,7 @@ export const useMBTITest = (): UseMBTITestReturn => {
     setResult(null);
     setError(null);
     setIsLoading(false);
-    localStorage.removeItem(STORAGE_KEY);
+    secureJsonStorage.removeItem(STORAGE_KEY);
   }, []);
 
   // 테스트 완료 시 자동으로 결과 계산

@@ -159,71 +159,83 @@ export const generateShareImage = async (
     // 이미지 캡처 전 스타일 최적화
     originalStyles = prepareElementForCapture(element);
 
-    // DOM 레이아웃 계산 완료 대기 (더 긴 시간)
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // DOM 레이아웃 계산 완룉 대기
+    await new Promise(resolve => setTimeout(resolve, 200));
     
-    // 전체 콘텐츠 크기 계산 (여유 공간 포함)
-    // 여러 번 측정하여 안정적인 크기 확보
-    let fullWidth = 0;
-    let fullHeight = 0;
+    // 정확한 콘텐츠 크기 측정 (불필요한 여백 없이)
+    const fullWidth = Math.max(
+      element.offsetWidth,
+      element.scrollWidth,
+      element.getBoundingClientRect().width
+    );
     
-    for (let i = 0; i < 3; i++) {
-      await new Promise(resolve => setTimeout(resolve, 50));
-      const currentWidth = Math.max(
-        element.offsetWidth,
-        element.scrollWidth,
-        element.getBoundingClientRect().width
-      );
-      const currentHeight = Math.max(
-        element.offsetHeight,
-        element.scrollHeight,
-        element.getBoundingClientRect().height
-      );
-      
-      fullWidth = Math.max(fullWidth, currentWidth);
-      fullHeight = Math.max(fullHeight, currentHeight);
-    }
+    const fullHeight = Math.max(
+      element.offsetHeight,
+      element.scrollHeight,
+      element.getBoundingClientRect().height
+    );
     
-    // 안전한 여유 공간 추가 (텍스트 잘림 방지)
-    fullHeight += 500;
+    // 최소한의 여유 공간만 추가 (텍스트 잘림 방지)
+    const optimizedHeight = fullHeight + 20;
 
-    // html2canvas 옵션 - 전체 콘텐츠 캡처를 위한 최적 설정
+    // html2canvas 옵션 - 정확한 콘텐츠 크기로 최적화
     const html2canvasOptions = {
       backgroundColor,
       scale: Math.min(scale, 2), // 고해상도 유지
       logging: false,
       useCORS: true,
       allowTaint: true,
-      width: fullWidth, // 전체 너비 사용
-      height: fullHeight, // 전체 높이 + 여유 공간 사용
+      width: fullWidth, // 정확한 너비
+      height: optimizedHeight, // 최적화된 높이
       scrollX: 0,
       scrollY: 0,
-      windowWidth: Math.max(element.scrollWidth, fullWidth, 1000), // 최소 1000px 보장
-      windowHeight: Math.max(element.scrollHeight, fullHeight, 2500), // 최소 2500px 보장
+      windowWidth: Math.max(fullWidth, 1000), // 최소한의 창 너비
+      windowHeight: optimizedHeight, // 실제 콘텐츠 높이에 맞춤
       x: 0,
       y: 0,
       removeContainer: false, // 컨테이너 제거하지 않음
       foreignObjectRendering: false,
-      imageTimeout: 30000, // 타임아웃 더 늘림 (30초)
+      imageTimeout: 25000, // 25초 타임아웃
       canvas: null, // 캔버스 재사용 방지
-      // 더 정교한 요소 필터링
+      // 강화된 요소 필터링 - 불필요한 요소 완전 제거
       ignoreElements: (element: Element) => {
         const htmlEl = element as HTMLElement;
-        return htmlEl.classList.contains('ignore-capture') ||
-               htmlEl.tagName === 'SCRIPT' ||
-               htmlEl.tagName === 'STYLE' ||
-               htmlEl.classList.contains('fixed') ||
-               htmlEl.style.position === 'fixed' ||
-               htmlEl.getAttribute('data-html2canvas-ignore') === 'true';
+        const textContent = htmlEl.textContent || '';
+        
+        // 기본 필터링 조건
+        if (htmlEl.classList.contains('ignore-capture') ||
+            htmlEl.tagName === 'SCRIPT' ||
+            htmlEl.tagName === 'STYLE' ||
+            htmlEl.classList.contains('fixed') ||
+            htmlEl.style.position === 'fixed' ||
+            htmlEl.getAttribute('data-html2canvas-ignore') === 'true') {
+          return true;
+        }
+        
+        // 파일 경로 패턴 필터링 (예: e:\Down\화면 캡처...)
+        const filePathPatterns = [
+          /^[a-zA-Z]:[\\/].*\.(png|jpg|jpeg|gif|bmp|webp)$/i, // 일반적인 파일 경로
+          /^화면\s*캡처/i, // 화면 캡처 텍스트
+          /^Screenshot/i, // Screenshot 텍스트
+          /\\Down\\/i, // Down 폴더 경로
+        ];
+        
+        return filePathPatterns.some(pattern => pattern.test(textContent.trim()));
       },
       // 클론된 문서 정리 - 안전한 렌더링을 위해
       onclone: (clonedDoc: Document) => {
-        // 안전한 그라디언트 처리
+        // 안전한 그라디언트 처리 및 이모지 폰트 최적화
         const style = clonedDoc.createElement('style');
         style.textContent = `
           * {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+          }
+          /* 이모지 폰트 최적화 */
+          .emoji, [style*="emoji"] {
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', sans-serif !important;
+            font-feature-settings: 'kern' 1;
+            text-rendering: optimizeLegibility;
           }
           /* 그라디언트를 단색으로 대체 */
           [style*="linear-gradient"] {
@@ -236,6 +248,11 @@ export const generateShareImage = async (
           /* 고정 요소 숨기기 */
           .fixed, [style*="position: fixed"] {
             display: none !important;
+          }
+          /* 교육 스타일 섹션 아이콘 최적화 */
+          [style*="Apple Color Emoji"] {
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif !important;
+            font-variant-emoji: emoji !important;
           }
         `;
         clonedDoc.head.appendChild(style);
@@ -256,20 +273,35 @@ export const generateShareImage = async (
         logging: false,
         useCORS: false,
         allowTaint: true,
-        width: fullWidth, // 전체 너비 사용
-        height: fullHeight, // 전체 높이 + 여유 공간 사용
-        windowWidth: Math.max(element.scrollWidth, fullWidth, 1000), // 최소 1000px 보장
-        windowHeight: Math.max(element.scrollHeight, fullHeight, 2500), // 최소 2500px 보장
+        width: fullWidth, // 정확한 너비
+        height: optimizedHeight, // 최적화된 높이
+        windowWidth: Math.max(fullWidth, 1000), // 최소한의 창 너비
+        windowHeight: optimizedHeight, // 실제 콘텐츠 높이
         removeContainer: false, // 컨테이너 제거하지 않음
-        imageTimeout: 30000, // 타임아웃 더 늘림 (30초)
+        imageTimeout: 25000, // 25초 타임아웃
         foreignObjectRendering: false,
         ignoreElements: (el: Element) => {
           const htmlEl = el as HTMLElement;
           const style = window.getComputedStyle(htmlEl);
-          return style.backgroundImage && style.backgroundImage.includes('gradient');
+          const textContent = htmlEl.textContent || '';
+          
+          // 그라디언트 배경 필터링
+          if (style.backgroundImage && style.backgroundImage.includes('gradient')) {
+            return true;
+          }
+          
+          // 파일 경로 패턴 필터링
+          const filePathPatterns = [
+            /^[a-zA-Z]:[\\/].*\.(png|jpg|jpeg|gif|bmp|webp)$/i,
+            /^화면\s*캡처/i,
+            /^Screenshot/i,
+            /\\Down\\/i,
+          ];
+          
+          return filePathPatterns.some(pattern => pattern.test(textContent.trim()));
         },
         onclone: (clonedDoc: Document) => {
-          // 모든 그라디언트 제거
+          // 모든 그라디언트 제거 및 이모지 폰트 최적화
           const style = clonedDoc.createElement('style');
           style.textContent = `
             * {
@@ -280,6 +312,12 @@ export const generateShareImage = async (
             .bg-gradient-to-r {
               background: #f8fafc !important;
               background-image: none !important;
+            }
+            /* 이모지 폰트 최적화 */
+            [style*="Apple Color Emoji"] {
+              font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif !important;
+              font-variant-emoji: emoji !important;
+              text-rendering: optimizeLegibility !important;
             }
           `;
           clonedDoc.head.appendChild(style);
@@ -375,7 +413,7 @@ const prepareElementForCapture = (element: HTMLElement) => {
   if (element.getAttribute('data-share-image') === 'complete-results' || element.getAttribute('data-share-image') === 'temp-complete-results') {
     element.style.width = '1000px';
     element.style.padding = '40px 40px 40px 40px'; // 균등한 패딩
-    element.style.minHeight = '2200px'; // 최소 높이 보장
+    // minHeight 제거 - 동적 크기 조정에 맡김
   }
 
   // 전체 콘텐츠가 표시되도록 높이 제한 해제

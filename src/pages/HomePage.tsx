@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Layout, Button, Card } from '../components/common';
+import { secureJsonStorage } from '../utils/secureStorage';
+import { TestState } from '../types/mbti';
 
 interface HomePageProps {
   onNavigateToTest: () => void;
   onNavigateToResult: () => void;
 }
 
-const HomePage: React.FC<HomePageProps> = React.memo(({ onNavigateToTest, onNavigateToResult: _unused }) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+const HomePage: FC<HomePageProps> = memo(({ onNavigateToTest, onNavigateToResult: _unused }) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   const [hasSavedTest, setHasSavedTest] = useState(false);
   const [savedProgress, setSavedProgress] = useState(0);
 
@@ -15,13 +17,13 @@ const HomePage: React.FC<HomePageProps> = React.memo(({ onNavigateToTest, onNavi
   // 저장된 테스트 상태 확인
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('mbti-test-state');
-      if (saved) {
-        const parsedState = JSON.parse(saved);
-        const hasProgress = parsedState.answers?.length > 0 || parsedState.currentQuestionIndex > 0;
-        if (hasProgress && !parsedState.isComplete) {
+      const parsedState = secureJsonStorage.getItem<TestState>('mbti-test-state');
+      if (parsedState && typeof parsedState === 'object') {
+        const state = parsedState;
+        const hasProgress = state.answers?.length > 0 || state.currentQuestionIndex > 0;
+        if (hasProgress && !state.isComplete) {
           setHasSavedTest(true);
-          setSavedProgress(Math.round((parsedState.answers?.length || 0) / 24 * 100));
+          setSavedProgress(Math.round((state.answers?.length || 0) / 24 * 100));
         }
       }
     } catch (error) {
@@ -31,15 +33,13 @@ const HomePage: React.FC<HomePageProps> = React.memo(({ onNavigateToTest, onNavi
 
   const handleNewTest = () => {
     try {
-      console.log('새로운 테스트를 시작합니다.');
       // 새로운 테스트 시작 시 기존 상태 삭제
-      localStorage.removeItem('mbti-test-state');
-      localStorage.removeItem('mbtiTestResult');
+      secureJsonStorage.removeItem('mbti-test-state');
+      secureJsonStorage.removeItem('mbtiTestResult');
       // 상태 업데이트
       setHasSavedTest(false);
       setSavedProgress(0);
       // 네비게이션
-      console.log('테스트 페이지로 이동합니다.');
       onNavigateToTest();
     } catch (err) {
       console.error('새로운 테스트 시작 중 오류:', err);
@@ -48,7 +48,6 @@ const HomePage: React.FC<HomePageProps> = React.memo(({ onNavigateToTest, onNavi
 
   const handleContinueTest = () => {
     try {
-      console.log('저장된 테스트를 계속 진행합니다.');
       onNavigateToTest();
     } catch (err) {
       console.error('테스트 계속하기 중 오류:', err);
@@ -57,10 +56,9 @@ const HomePage: React.FC<HomePageProps> = React.memo(({ onNavigateToTest, onNavi
 
   const handleStartTest = () => {
     try {
-      console.log('새로운 테스트를 시작합니다.');
       // 새로운 테스트 시작 시 기존 상태 삭제
-      localStorage.removeItem('mbti-test-state');
-      localStorage.removeItem('mbtiTestResult');
+      secureJsonStorage.removeItem('mbti-test-state');
+      secureJsonStorage.removeItem('mbtiTestResult');
       // 상태 업데이트
       setHasSavedTest(false);
       setSavedProgress(0);

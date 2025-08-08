@@ -113,19 +113,27 @@ export const QuickActions = ({
   // 기존 페이지의 콘텐츠를 복사하여 이미지 생성용 컨테이너 생성
   const createImageFromExistingContent = async (): Promise<HTMLElement | null> => {
     try {
-      // 임시 컨테이너 생성
+      // 이전에 남은 임시 컨테이너 완전 제거
+      const existingContainers = document.querySelectorAll('[id^="temp-image-container"]');
+      existingContainers.forEach(container => {
+        if (container.parentNode) {
+          container.parentNode.removeChild(container);
+        }
+      });
+      
+      // 새로운 임시 컨테이너 생성
       const tempContainer = document.createElement('div');
       tempContainer.setAttribute('data-share-image', 'complete-results');
       tempContainer.id = 'temp-image-container';
       
-      // 수정된 컨테이너 스타일 - 웹페이지와 일치하는 폰트 및 스타일
+      // 최적화된 컨테이너 스타일 - 전체 콘텐츠에 맞춰 정확한 크기 설정
       tempContainer.style.cssText = `
         position: fixed;
         top: 50px;
         left: 50px;
         width: 1000px;
         height: auto;
-        min-height: 2200px;
+        min-height: auto;
         max-height: none;
         background: #ffffff;
         padding: 40px;
@@ -213,41 +221,101 @@ export const QuickActions = ({
       branding.appendChild(brandingCard);
       tempContainer.appendChild(branding);
       
-      // 렌더링 완료 기다리기 (더 긴 시간으로 수정)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 렌더링 완료 기다리기
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // 실제 렌더링된 크기 확인하고 컨테이너 크기 동적 조정
-      // 여러 번 측정하여 가장 큰 값 사용
-      let maxHeight = 0;
+      // 실제 콘텐츠의 정확한 크기 측정 (최소한의 여백만 포함)
+      const measureActualContentHeight = () => {
+        let totalHeight = 0;
+        
+        // 상단 패딩 40px
+        totalHeight += 40;
+        
+        // 각 자식 요소의 실제 높이 측정
+        Array.from(tempContainer.children).forEach((child) => {
+          const element = child as HTMLElement;
+          const rect = element.getBoundingClientRect();
+          const styles = window.getComputedStyle(element);
+          
+          // 요소 높이 + 마진
+          const elementHeight = rect.height + 
+            parseFloat(styles.marginTop) + 
+            parseFloat(styles.marginBottom);
+          
+          totalHeight += elementHeight;
+        });
+        
+        // 하단 패딩 40px
+        totalHeight += 40;
+        
+        return Math.ceil(totalHeight);
+      };
+      
+      // 여러 번 측정하여 안정적인 값 확보
+      let actualContentHeight = 0;
       for (let i = 0; i < 3; i++) {
         await new Promise(resolve => setTimeout(resolve, 100));
-        const currentHeight = Math.max(
-          tempContainer.offsetHeight,
-          tempContainer.scrollHeight,
-          tempContainer.getBoundingClientRect().height,
-          [...tempContainer.children].reduce((acc, child) => {
-            const childRect = (child as HTMLElement).getBoundingClientRect();
-            return acc + childRect.height;
-          }, 0) + 80 // 패딩 고려
-        );
-        maxHeight = Math.max(maxHeight, currentHeight);
+        const measured = measureActualContentHeight();
+        actualContentHeight = Math.max(actualContentHeight, measured);
       }
       
-      // 추가 여유 공간을 위해 실제 높이보다 400px 더 크게 설정 (텍스트 잘림 방지)
-      const finalHeight = maxHeight + 400;
-      tempContainer.style.minHeight = `${finalHeight}px`;
-      tempContainer.style.height = `${finalHeight}px`;
+      // 최소한의 여유 공간만 추가 (텍스트 잘림 방지를 위한 안전 마진)
+      const safetyMargin = 60; // 최소한의 안전 마진
+      const finalHeight = actualContentHeight + safetyMargin;
       
-      // 크기 조정 후 추가 렌더링 대기
-      await new Promise(resolve => setTimeout(resolve, 500));
+      tempContainer.style.height = `${finalHeight}px`;
+      tempContainer.style.minHeight = `${finalHeight}px`;
+      
+      // 컨테이너 크기 조정 후 최종 렌더링 대기
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // 컨테이너에서 불필요한 콘텐츠 제거 (파일 경로 등)
+      const cleanupUnwantedContent = (container: HTMLElement) => {
+        const walker = document.createTreeWalker(
+          container,
+          NodeFilter.SHOW_TEXT
+        );
+        
+        const textNodesToRemove: Node[] = [];
+        let node;
+        
+        while ((node = walker.nextNode())) {
+          const textContent = node.textContent?.trim() || '';
+          
+          // 파일 경로 패턴 필터링
+          const unwantedPatterns = [
+            /^[a-zA-Z]:[\\/].*\.(png|jpg|jpeg|gif|bmp|webp)$/i,
+            /^화면\s*캡처/i,
+            /^Screenshot/i,
+            /\\Down\\/i,
+            /^temp-image-container/i,
+          ];
+          
+          if (unwantedPatterns.some(pattern => pattern.test(textContent))) {
+            textNodesToRemove.push(node);
+          }
+        }
+        
+        // 불필요한 텍스트 노드 제거
+        textNodesToRemove.forEach(node => {
+          if (node.parentNode) {
+            node.parentNode.removeChild(node);
+          }
+        });
+      };
+      
+      cleanupUnwantedContent(tempContainer);
       
       return tempContainer;
     } catch (error) {
       console.error('Failed to create image container:', error);
-      const existing = document.getElementById('temp-image-container');
-      if (existing) {
-        document.body.removeChild(existing);
-      }
+      // 에러 발생 시 모든 임시 컨테이너 제거
+      const existing = document.querySelectorAll('[id^="temp-image-container"]');
+      existing.forEach(container => {
+        if (container.parentNode) {
+          container.parentNode.removeChild(container);
+        }
+      });
       return null;
     }
   };
@@ -428,41 +496,37 @@ export const QuickActions = ({
   const createTeachingStyleSection = (): string => {
     const { teachingStyle } = typeInfo;
     
+    // html2canvas 호환을 위한 이모지 아이콘과 단색 배경 사용
     const styleAspects = [
       {
         title: "전체적인 교육 철학",
         content: teachingStyle?.overview || typeInfo.description,
-        icon: `<svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>`,
-        gradientFrom: "#3b82f6",
-        gradientTo: "#9333ea"
+        iconEmoji: "📚",
+        bgColor: "#3b82f6"
       },
       {
         title: "학급 운영 방식", 
         content: teachingStyle?.classroomManagement || '체계적이고 학생 중심적인 학급 운영을 통해 효과적인 학습 환경을 조성합니다.',
-        icon: `<svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" /></svg>`,
-        gradientFrom: "#10b981",
-        gradientTo: "#0d9488"
+        iconEmoji: "👥",
+        bgColor: "#10b981"
       },
       {
         title: "교수법 및 수업 진행",
         content: teachingStyle?.instructionMethod || '다양한 교수법을 활용하여 학생들의 이해도를 높이고 참여를 유도합니다.',
-        icon: `<svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" /><path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" /></svg>`,
-        gradientFrom: "#f97316",
-        gradientTo: "#dc2626"
+        iconEmoji: "🎓",
+        bgColor: "#f97316"
       },
       {
         title: "학생과의 상호작용",
         content: teachingStyle?.studentInteraction || '학생들과 긍정적인 관계를 구축하며 개별적인 필요를 파악하고 지원합니다.',
-        icon: `<svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>`,
-        gradientFrom: "#ec4899",
-        gradientTo: "#e11d48"
+        iconEmoji: "💬",
+        bgColor: "#ec4899"
       },
       {
         title: "평가 및 피드백 방식",
         content: teachingStyle?.assessment || '공정하고 건설적인 평가를 통해 학생들의 성장을 돕습니다.',
-        icon: `<svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>`,
-        gradientFrom: "#6366f1",
-        gradientTo: "#9333ea"
+        iconEmoji: "📊",
+        bgColor: "#6366f1"
       }
     ];
     
@@ -475,14 +539,14 @@ export const QuickActions = ({
         
         <div style="display: flex; flex-direction: column; gap: 24px;">
           ${styleAspects.map(aspect => `
-            <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #f3f4f6; position: relative; overflow: hidden; transition: all 0.3s ease;">
-              <!-- 상단 그라데이션 라인 -->
-              <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(to right, ${aspect.gradientFrom}, ${aspect.gradientTo});"></div>
+            <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #f3f4f6; position: relative; overflow: hidden;">
+              <!-- 상단 색상 라인 - html2canvas 최적화 -->
+              <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background-color: ${aspect.bgColor}; background-image: none;"></div>
               
               <div style="display: flex; align-items: flex-start; gap: 16px;">
-                <!-- 아이콘 -->
-                <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(to right, ${aspect.gradientFrom}, ${aspect.gradientTo}); display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                  ${aspect.icon}
+                <!-- 이모지 아이콘 - html2canvas 최적화 -->
+                <div style="width: 48px; height: 48px; border-radius: 12px; background-color: ${aspect.bgColor}; background-image: none; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); font-size: 24px; font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; line-height: 1; text-align: center;">
+                  ${aspect.iconEmoji}
                 </div>
                 
                 <!-- 콘텐츠 -->
@@ -501,10 +565,8 @@ export const QuickActions = ({
         
         <!-- 추가 인사이트 -->
         <div style="margin-top: 32px; background: white; border-radius: 12px; padding: 32px; text-align: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #f3f4f6;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background-color: ${typeInfo.color}; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-            <svg width="32" height="32" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
-            </svg>
+          <div style="width: 64px; height: 64px; border-radius: 50%; background-color: ${typeInfo.color}; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: white; font-size: 32px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+            ✨
           </div>
           
           <h3 style="font-family: ${FONT_STACK}; font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 16px;">
@@ -678,15 +740,14 @@ export const QuickActions = ({
         </div>
         
         <!-- 전체 요약 -->
-        <div style="margin-top: 50px; margin-bottom: 80px; page-break-inside: avoid; width: 100%;">
+        <div style="margin-top: 50px; margin-bottom: 40px; page-break-inside: avoid; width: 100%;">
           <div style="
             background: #f8fafc; 
             border-radius: 16px; 
-            padding: 50px 40px 60px 40px; 
+            padding: 40px 32px 40px 32px; 
             text-align: center; 
             border: 2px solid #e5e7eb;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            min-height: 300px;
             width: 100%;
             box-sizing: border-box;
           ">

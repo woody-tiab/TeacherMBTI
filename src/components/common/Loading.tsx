@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { motion } from 'framer-motion';
 
 interface LoadingProps {
@@ -8,7 +8,7 @@ interface LoadingProps {
   className?: string;
 }
 
-const Loading: React.FC<LoadingProps> = ({ 
+const Loading: FC<LoadingProps> = ({ 
   message = '로딩 중...', 
   size = 'md', 
   fullScreen = false,

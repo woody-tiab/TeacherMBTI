@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type PageType = 'home' | 'test' | 'result';
@@ -9,7 +9,7 @@ interface NavigationProps {
   onNavigate: (page: PageType) => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ className = '', currentPage, onNavigate }) => {
+const Navigation: FC<NavigationProps> = ({ className = '', currentPage, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [

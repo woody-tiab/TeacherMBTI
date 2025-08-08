@@ -4,6 +4,7 @@ import { useMBTITest } from '../hooks/useMBTITest';
 import { MBTIQuestionOption, MBTIAnswer } from '../types/mbti';
 import QuestionCard from '../components/question/QuestionCard';
 import QuestionNavigation from '../components/question/QuestionNavigation';
+import { secureJsonStorage } from '../utils/secureStorage';
 
 interface TestPageProps {
   onNavigateToHome: () => void;
@@ -34,14 +35,11 @@ const TestPage: React.FC<TestPageProps> = ({ onNavigateToHome: _unused, onNaviga
   // 테스트 초기화
   useEffect(() => {
     try {
-      // localStorage에서 상태 확인
-      const savedState = localStorage.getItem('mbti-test-state');
+      // 보안 스토리지에서 상태 확인
+      const savedState = secureJsonStorage.getItem('mbti-test-state');
       if (!savedState) {
         // 저장된 상태가 없으면 새로운 테스트 시작
-        console.log('저장된 상태가 없어서 새로운 테스트를 시작합니다.');
         startTest();
-      } else {
-        console.log('저장된 상태를 사용합니다.');
       }
     } catch (err) {
       console.error('테스트 초기화 중 오류:', err);
@@ -52,7 +50,7 @@ const TestPage: React.FC<TestPageProps> = ({ onNavigateToHome: _unused, onNaviga
   useEffect(() => {
     if (result && testState.isComplete) {
       try {
-        localStorage.setItem('mbtiTestResult', JSON.stringify(result));
+        secureJsonStorage.setItem('mbtiTestResult', result);
         onNavigateToResult();
       } catch (error) {
         console.error('Failed to save result:', error);
